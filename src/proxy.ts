@@ -1,6 +1,8 @@
 import { createServerClient } from "@supabase/ssr";
 import { NextResponse, type NextRequest } from "next/server";
 
+const authRoutes = ["/login", "/signup", "/forgot-password", "/reset-password"];
+
 export async function proxy(request: NextRequest) {
   let supabaseResponse = NextResponse.next({
     request,
@@ -33,8 +35,16 @@ export async function proxy(request: NextRequest) {
   // supabase.auth.getUser(). A simple mistake could make it very hard to debug
   // issues with users being randomly logged out.
 
-  // Refreshes the auth token if expired
-  await supabase.auth.getUser();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+
+  const { pathname } = request.nextUrl;
+
+  // Redirect authenticated users away from auth pages
+  if (user && authRoutes.some((route) => pathname.startsWith(route))) {
+    return NextResponse.redirect(new URL("/", request.url));
+  }
 
   return supabaseResponse;
 }
