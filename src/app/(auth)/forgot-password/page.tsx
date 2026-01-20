@@ -9,7 +9,7 @@ export default async function ForgotPasswordPage() {
   } = await supabase.auth.getUser();
 
   if (user) {
-    redirect("/");
+    redirect("/dashboard");
   }
 
   return (

@@ -43,7 +43,7 @@ export async function login(
     return { error: error.message };
   }
 
-  const redirectTo = formData.get("redirectTo")?.toString() || "/";
+  const redirectTo = formData.get("redirectTo")?.toString() || "/dashboard";
   redirect(redirectTo);
 }
 

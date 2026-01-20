@@ -1,9 +1,29 @@
 import Link from "next/link";
+import { createClient } from "@/lib/supabase/server";
 import { Button } from "@/components/ui/button";
 
-export default function Home() {
+export default async function Home() {
+  const supabase = await createClient();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+
   return (
     <main className="min-h-screen">
+      {/* NavBar */}
+      <header className="sticky top-0 z-50 border-b border-neutral-200 bg-white">
+        <div className="mx-auto flex h-16 max-w-7xl items-center justify-between px-4 sm:px-6 lg:px-8">
+          <Link href="/" className="text-xl font-bold text-neutral-900">
+            BillScribe
+          </Link>
+          {user && (
+            <Link href="/dashboard">
+              <Button size="sm">Dashboard</Button>
+            </Link>
+          )}
+        </div>
+      </header>
+
       {/* Hero Section */}
       <section className="flex flex-col items-center justify-center px-6 py-24 sm:py-32">
         <div className="mx-auto max-w-2xl text-center">
