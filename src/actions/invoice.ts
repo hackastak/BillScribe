@@ -143,7 +143,7 @@ export async function uploadLogoAction(
   const filePath = `logos/${user.id}/logo.${ext}`;
 
   const { error: uploadError } = await supabase.storage
-    .from("public")
+    .from("assets")
     .upload(filePath, file, { upsert: true });
 
   if (uploadError) {
@@ -153,7 +153,7 @@ export async function uploadLogoAction(
 
   const {
     data: { publicUrl },
-  } = supabase.storage.from("public").getPublicUrl(filePath);
+  } = supabase.storage.from("assets").getPublicUrl(filePath);
 
   try {
     await updateProfile(user.id, { logoUrl: publicUrl });

@@ -170,3 +170,108 @@ export async function checkInvoiceNumberExists(
 
   return result.length > 0;
 }
+
+export type InvoiceItem = {
+  id: string;
+  description: string;
+  quantity: string;
+  unitPrice: string;
+  amount: string;
+};
+
+export type InvoiceWithDetails = {
+  id: string;
+  invoiceNumber: string;
+  status: "draft" | "sent" | "paid" | "overdue" | "cancelled";
+  issueDate: string;
+  dueDate: string | null;
+  subtotal: string | null;
+  taxRate: string | null;
+  taxAmount: string | null;
+  total: string;
+  notes: string | null;
+  client: {
+    id: string;
+    name: string;
+    email: string | null;
+    phone: string | null;
+    company: string | null;
+    address: string | null;
+  } | null;
+  items: InvoiceItem[];
+};
+
+export async function getInvoiceById(
+  userId: string,
+  invoiceId: string
+): Promise<InvoiceWithDetails | null> {
+  const invoiceResult = await db
+    .select({
+      id: invoices.id,
+      invoiceNumber: invoices.invoiceNumber,
+      status: invoices.status,
+      issueDate: invoices.issueDate,
+      dueDate: invoices.dueDate,
+      subtotal: invoices.subtotal,
+      taxRate: invoices.taxRate,
+      taxAmount: invoices.taxAmount,
+      total: invoices.total,
+      notes: invoices.notes,
+      clientId: clients.id,
+      clientName: clients.name,
+      clientEmail: clients.email,
+      clientPhone: clients.phone,
+      clientCompany: clients.company,
+      clientAddress: clients.address,
+    })
+    .from(invoices)
+    .leftJoin(clients, eq(invoices.clientId, clients.id))
+    .where(and(eq(invoices.id, invoiceId), eq(invoices.userId, userId)))
+    .limit(1);
+
+  const invoice = invoiceResult[0];
+  if (!invoice) {
+    return null;
+  }
+
+  const itemsResult = await db
+    .select({
+      id: invoiceItems.id,
+      description: invoiceItems.description,
+      quantity: invoiceItems.quantity,
+      unitPrice: invoiceItems.unitPrice,
+      amount: invoiceItems.amount,
+    })
+    .from(invoiceItems)
+    .where(eq(invoiceItems.invoiceId, invoiceId));
+
+  return {
+    id: invoice.id,
+    invoiceNumber: invoice.invoiceNumber,
+    status: invoice.status,
+    issueDate: invoice.issueDate,
+    dueDate: invoice.dueDate,
+    subtotal: invoice.subtotal,
+    taxRate: invoice.taxRate,
+    taxAmount: invoice.taxAmount,
+    total: invoice.total ?? "0",
+    notes: invoice.notes,
+    client: invoice.clientId
+      ? {
+          id: invoice.clientId,
+          name: invoice.clientName!,
+          email: invoice.clientEmail,
+          phone: invoice.clientPhone,
+          company: invoice.clientCompany,
+          address: invoice.clientAddress,
+        }
+      : null,
+    items: itemsResult.map((item) => ({
+      id: item.id,
+      description: item.description,
+      quantity: item.quantity,
+      unitPrice: item.unitPrice,
+      amount: item.amount,
+    })),
+  };
+}

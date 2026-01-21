@@ -7,26 +7,37 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Card } from "@/components/ui/card";
+import { Modal } from "@/components/ui/modal";
 import { ClientSelector } from "./client-selector";
 import { LineItems, type LineItem } from "./line-items";
+import {
+  InvoicePreviewContent,
+  type InvoicePreviewData,
+} from "./invoice-preview";
 import type { Client } from "@/lib/db/queries/clients";
+import type { Profile } from "@/lib/db/queries/profiles";
 
 interface InvoiceFormProps {
   clients: Client[];
   nextInvoiceNumber: string;
+  profile: Profile | null;
 }
 
-export function InvoiceForm({ clients, nextInvoiceNumber }: InvoiceFormProps) {
+export function InvoiceForm({
+  clients,
+  nextInvoiceNumber,
+  profile,
+}: InvoiceFormProps) {
   const router = useRouter();
   const [clientList, setClientList] = useState<Client[]>(clients);
-  const [selectedClientId, setSelectedClientId] = useState("");
-  const [invoiceNumber, setInvoiceNumber] = useState(nextInvoiceNumber);
-  const [issueDate, setIssueDate] = useState(
-    new Date().toISOString().split("T")[0]
+  const [selectedClientId, setSelectedClientId] = useState<string>("");
+  const [invoiceNumber, setInvoiceNumber] = useState<string>(nextInvoiceNumber);
+  const [issueDate, setIssueDate] = useState<string>(
+    new Date().toISOString().split("T")[0] ?? ""
   );
-  const [dueDate, setDueDate] = useState("");
-  const [taxRate, setTaxRate] = useState("");
-  const [notes, setNotes] = useState("");
+  const [dueDate, setDueDate] = useState<string>("");
+  const [taxRate, setTaxRate] = useState<string>("");
+  const [notes, setNotes] = useState<string>("");
   const [items, setItems] = useState<LineItem[]>([
     {
       id: crypto.randomUUID(),
@@ -37,6 +48,7 @@ export function InvoiceForm({ clients, nextInvoiceNumber }: InvoiceFormProps) {
     },
   ]);
   const [errors, setErrors] = useState<Record<string, string[]>>({});
+  const [showPreview, setShowPreview] = useState(false);
 
   const calculations = useMemo(() => {
     const subtotal = items.reduce(
@@ -109,10 +121,12 @@ export function InvoiceForm({ clients, nextInvoiceNumber }: InvoiceFormProps) {
 
   const handlePreview = () => {
     if (!validateForm()) return;
+    setShowPreview(true);
+  };
 
+  const getPreviewData = (): InvoicePreviewData => {
     const selectedClient = clientList.find((c) => c.id === selectedClientId);
-
-    const invoiceData = {
+    return {
       clientId: selectedClientId,
       client: selectedClient || null,
       invoiceNumber,
@@ -125,135 +139,147 @@ export function InvoiceForm({ clients, nextInvoiceNumber }: InvoiceFormProps) {
       ),
       ...calculations,
     };
+  };
 
-    sessionStorage.setItem("invoicePreview", JSON.stringify(invoiceData));
-    router.push("/invoices/preview");
+  const handleSuccess = () => {
+    setShowPreview(false);
   };
 
   return (
-    <div className="space-y-6">
-      <Card>
-        <div className="grid gap-6 md:grid-cols-2">
-          <ClientSelector
-            clients={clientList}
-            selectedClientId={selectedClientId}
-            onClientSelect={setSelectedClientId}
-            onClientCreated={handleClientCreated}
-          />
+    <>
+      <div className="space-y-6">
+        <Card>
+          <div className="grid gap-6 md:grid-cols-2">
+            <ClientSelector
+              clients={clientList}
+              selectedClientId={selectedClientId}
+              onClientSelect={setSelectedClientId}
+              onClientCreated={handleClientCreated}
+            />
 
-          <div className="space-y-4">
-            <div className="space-y-2">
-              <Label htmlFor="invoiceNumber">Invoice Number *</Label>
-              <Input
-                id="invoiceNumber"
-                value={invoiceNumber}
-                onChange={(e) => setInvoiceNumber(e.target.value)}
-                placeholder="INV-2026-0001"
-                error={!!errors.invoiceNumber}
-              />
-              {errors.invoiceNumber && (
-                <p className="text-sm text-error-600">
-                  {errors.invoiceNumber[0]}
-                </p>
-              )}
-            </div>
-
-            <div className="grid grid-cols-2 gap-4">
+            <div className="space-y-4">
               <div className="space-y-2">
-                <Label htmlFor="issueDate">Issue Date *</Label>
+                <Label htmlFor="invoiceNumber">Invoice Number *</Label>
                 <Input
-                  id="issueDate"
-                  type="date"
-                  value={issueDate}
-                  onChange={(e) => setIssueDate(e.target.value)}
-                  error={!!errors.issueDate}
+                  id="invoiceNumber"
+                  value={invoiceNumber}
+                  onChange={(e) => setInvoiceNumber(e.target.value)}
+                  placeholder="INV-2026-0001"
+                  error={!!errors.invoiceNumber}
                 />
-                {errors.issueDate && (
+                {errors.invoiceNumber && (
                   <p className="text-sm text-error-600">
-                    {errors.issueDate[0]}
+                    {errors.invoiceNumber[0]}
                   </p>
                 )}
               </div>
-              <div className="space-y-2">
-                <Label htmlFor="dueDate">Due Date</Label>
-                <Input
-                  id="dueDate"
-                  type="date"
-                  value={dueDate}
-                  onChange={(e) => setDueDate(e.target.value)}
-                  error={!!errors.dueDate}
-                />
-                {errors.dueDate && (
-                  <p className="text-sm text-error-600">{errors.dueDate[0]}</p>
-                )}
+
+              <div className="grid grid-cols-2 gap-4">
+                <div className="space-y-2">
+                  <Label htmlFor="issueDate">Issue Date *</Label>
+                  <Input
+                    id="issueDate"
+                    type="date"
+                    value={issueDate}
+                    onChange={(e) => setIssueDate(e.target.value)}
+                    error={!!errors.issueDate}
+                  />
+                  {errors.issueDate && (
+                    <p className="text-sm text-error-600">
+                      {errors.issueDate[0]}
+                    </p>
+                  )}
+                </div>
+                <div className="space-y-2">
+                  <Label htmlFor="dueDate">Due Date</Label>
+                  <Input
+                    id="dueDate"
+                    type="date"
+                    value={dueDate}
+                    onChange={(e) => setDueDate(e.target.value)}
+                    error={!!errors.dueDate}
+                  />
+                  {errors.dueDate && (
+                    <p className="text-sm text-error-600">{errors.dueDate[0]}</p>
+                  )}
+                </div>
               </div>
             </div>
           </div>
-        </div>
-      </Card>
+        </Card>
 
-      <Card>
-        <LineItems items={items} onItemsChange={setItems} errors={errors} />
-      </Card>
+        <Card>
+          <LineItems items={items} onItemsChange={setItems} errors={errors} />
+        </Card>
 
-      <Card>
-        <div className="grid gap-6 md:grid-cols-2">
-          <div className="space-y-2">
-            <Label htmlFor="notes">Notes</Label>
-            <Textarea
-              id="notes"
-              value={notes}
-              onChange={(e) => setNotes(e.target.value)}
-              placeholder="Payment terms, thank you message, or any additional notes..."
-              rows={4}
-            />
-          </div>
-
-          <div className="space-y-4">
+        <Card>
+          <div className="grid gap-6 md:grid-cols-2">
             <div className="space-y-2">
-              <Label htmlFor="taxRate">Tax Rate (%)</Label>
-              <Input
-                id="taxRate"
-                type="number"
-                min="0"
-                max="100"
-                step="0.01"
-                value={taxRate}
-                onChange={(e) => setTaxRate(e.target.value)}
-                placeholder="0.00"
+              <Label htmlFor="notes">Notes</Label>
+              <Textarea
+                id="notes"
+                value={notes}
+                onChange={(e) => setNotes(e.target.value)}
+                placeholder="Payment terms, thank you message, or any additional notes..."
+                rows={4}
               />
             </div>
 
-            <div className="rounded-lg bg-neutral-50 p-4 space-y-2">
-              <div className="flex justify-between text-sm">
-                <span className="text-neutral-600">Subtotal</span>
-                <span className="font-medium">${calculations.subtotal}</span>
+            <div className="space-y-4">
+              <div className="space-y-2">
+                <Label htmlFor="taxRate">Tax Rate (%)</Label>
+                <Input
+                  id="taxRate"
+                  type="number"
+                  min="0"
+                  max="100"
+                  step="0.01"
+                  value={taxRate}
+                  onChange={(e) => setTaxRate(e.target.value)}
+                  placeholder="0.00"
+                />
               </div>
-              {parseFloat(taxRate) > 0 && (
+
+              <div className="rounded-lg bg-neutral-50 p-4 space-y-2">
                 <div className="flex justify-between text-sm">
-                  <span className="text-neutral-600">Tax ({taxRate}%)</span>
-                  <span className="font-medium">${calculations.taxAmount}</span>
+                  <span className="text-neutral-600">Subtotal</span>
+                  <span className="font-medium">${calculations.subtotal}</span>
                 </div>
-              )}
-              <div className="border-t border-neutral-200 pt-2 flex justify-between">
-                <span className="font-medium text-neutral-900">Total</span>
-                <span className="text-lg font-semibold text-neutral-900">
-                  ${calculations.total}
-                </span>
+                {parseFloat(taxRate) > 0 && (
+                  <div className="flex justify-between text-sm">
+                    <span className="text-neutral-600">Tax ({taxRate}%)</span>
+                    <span className="font-medium">${calculations.taxAmount}</span>
+                  </div>
+                )}
+                <div className="border-t border-neutral-200 pt-2 flex justify-between">
+                  <span className="font-medium text-neutral-900">Total</span>
+                  <span className="text-lg font-semibold text-neutral-900">
+                    ${calculations.total}
+                  </span>
+                </div>
               </div>
             </div>
           </div>
-        </div>
-      </Card>
+        </Card>
 
-      <div className="flex justify-end gap-3">
-        <Button type="button" variant="secondary" onClick={() => router.back()}>
-          Cancel
-        </Button>
-        <Button type="button" onClick={handlePreview}>
-          Preview Invoice
-        </Button>
+        <div className="flex justify-end gap-3">
+          <Button type="button" variant="secondary" onClick={() => router.back()}>
+            Cancel
+          </Button>
+          <Button type="button" onClick={handlePreview}>
+            Preview Invoice
+          </Button>
+        </div>
       </div>
-    </div>
+
+      <Modal isOpen={showPreview} onClose={() => setShowPreview(false)}>
+        <InvoicePreviewContent
+          profile={profile}
+          data={getPreviewData()}
+          onClose={() => setShowPreview(false)}
+          onSuccess={handleSuccess}
+        />
+      </Modal>
+    </>
   );
 }

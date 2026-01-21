@@ -2,6 +2,7 @@ import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 import { getClients } from "@/lib/db/queries/clients";
 import { getNextInvoiceNumber } from "@/lib/db/queries/invoices";
+import { getProfile } from "@/lib/db/queries/profiles";
 import { InvoiceForm } from "@/components/invoice/invoice-form";
 
 export default async function NewInvoicePage() {
@@ -14,9 +15,10 @@ export default async function NewInvoicePage() {
     redirect("/login");
   }
 
-  const [clients, nextInvoiceNumber] = await Promise.all([
+  const [clients, nextInvoiceNumber, profile] = await Promise.all([
     getClients(user.id),
     getNextInvoiceNumber(user.id),
+    getProfile(user.id),
   ]);
 
   return (
@@ -30,7 +32,11 @@ export default async function NewInvoicePage() {
         </p>
       </div>
 
-      <InvoiceForm clients={clients} nextInvoiceNumber={nextInvoiceNumber} />
+      <InvoiceForm
+        clients={clients}
+        nextInvoiceNumber={nextInvoiceNumber}
+        profile={profile}
+      />
     </div>
   );
 }
