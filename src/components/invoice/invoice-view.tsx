@@ -65,7 +65,7 @@ export function InvoiceView({
             initialStatus={invoice.status}
           />
         </div>
-        <div className="flex items-center gap-3">
+        <div className="flex items-center gap-3 mr-12">
           <Button variant="secondary" size="sm">
             Download PDF
           </Button>
