@@ -1,11 +1,12 @@
 "use server";
 
 import { createClient } from "@/lib/supabase/server";
-import { redirect } from "next/navigation";
+import { revalidatePath } from "next/cache";
 import { invoiceSchema } from "@/lib/validations/invoice";
 import {
   createInvoice as createDbInvoice,
   checkInvoiceNumberExists,
+  updateInvoiceStatus,
 } from "@/lib/db/queries/invoices";
 import { updateProfile } from "@/lib/db/queries/profiles";
 
@@ -161,5 +162,29 @@ export async function uploadLogoAction(
   } catch (error) {
     console.error("Error updating profile:", error);
     return { error: "Failed to save logo. Please try again." };
+  }
+}
+
+export async function updateInvoiceStatusAction(
+  invoiceId: string,
+  status: "draft" | "sent" | "paid" | "overdue" | "cancelled"
+) {
+  const supabase = await createClient();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+
+  if (!user) {
+    throw new Error("You must be logged in to update an invoice");
+  }
+
+  try {
+    await updateInvoiceStatus(user.id, invoiceId, status);
+    revalidatePath("/dashboard");
+    revalidatePath(`/invoices/${invoiceId}`);
+    return { success: true };
+  } catch (error) {
+    console.error("Error updating invoice status:", error);
+    return { error: "Failed to update invoice status" };
   }
 }

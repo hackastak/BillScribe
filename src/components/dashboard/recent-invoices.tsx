@@ -1,18 +1,10 @@
 import Link from "next/link";
 import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
-import { cn } from "@/lib/utils";
 import type { RecentInvoice } from "@/lib/db/queries/invoices";
+import { InvoiceStatusSelect } from "@/components/invoice/invoice-status-select";
 
 type RecentInvoicesProps = {
   invoices: RecentInvoice[];
-};
-
-const statusStyles: Record<RecentInvoice["status"], string> = {
-  draft: "bg-neutral-100 text-neutral-700",
-  sent: "bg-blue-100 text-blue-700",
-  paid: "bg-green-100 text-green-700",
-  overdue: "bg-red-100 text-red-700",
-  cancelled: "bg-neutral-100 text-neutral-500",
 };
 
 function formatCurrency(amount: string | number): string {
@@ -101,14 +93,10 @@ export function RecentInvoices({ invoices }: RecentInvoicesProps) {
                       {invoice.clientName ?? "No client"}
                     </td>
                     <td className="py-4">
-                      <span
-                        className={cn(
-                          "inline-flex rounded-full px-2 py-1 text-xs font-medium capitalize",
-                          statusStyles[invoice.status]
-                        )}
-                      >
-                        {invoice.status}
-                      </span>
+                      <InvoiceStatusSelect
+                        invoiceId={invoice.id}
+                        initialStatus={invoice.status}
+                      />
                     </td>
                     <td className="py-4 text-neutral-600">
                       {formatDate(invoice.issueDate)}

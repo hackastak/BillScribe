@@ -6,6 +6,7 @@ import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import type { Profile } from "@/lib/db/queries/profiles";
 import type { InvoiceWithDetails } from "@/lib/db/queries/invoices";
+import { InvoiceStatusSelect } from "@/components/invoice/invoice-status-select";
 
 interface InvoiceViewProps {
   invoice: InvoiceWithDetails;
@@ -24,21 +25,6 @@ function formatDate(dateStr: string | null) {
     month: "long",
     day: "numeric",
   });
-}
-
-function getStatusBadgeStyles(status: string) {
-  switch (status) {
-    case "paid":
-      return "bg-success-100 text-success-700";
-    case "sent":
-      return "bg-primary-100 text-primary-700";
-    case "overdue":
-      return "bg-error-100 text-error-700";
-    case "cancelled":
-      return "bg-neutral-100 text-neutral-700";
-    default:
-      return "bg-warning-100 text-warning-700";
-  }
 }
 
 export function InvoiceView({ invoice, profile }: InvoiceViewProps) {
@@ -67,11 +53,10 @@ export function InvoiceView({ invoice, profile }: InvoiceViewProps) {
           <h1 className="text-2xl font-bold text-neutral-900">
             {invoice.invoiceNumber}
           </h1>
-          <span
-            className={`inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-medium capitalize ${getStatusBadgeStyles(invoice.status)}`}
-          >
-            {invoice.status}
-          </span>
+          <InvoiceStatusSelect
+            invoiceId={invoice.id}
+            initialStatus={invoice.status}
+          />
         </div>
         <div className="flex items-center gap-3">
           <Button variant="secondary" size="sm">

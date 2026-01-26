@@ -1,6 +1,6 @@
 import { db } from "@/lib/db";
 import { invoices, invoiceItems, clients } from "@/lib/db/schema";
-import { eq, desc, sql, and, or, like } from "drizzle-orm";
+import { eq, desc, sql, and, like } from "drizzle-orm";
 
 export type InvoiceStats = {
   totalInvoices: number;
@@ -74,7 +74,10 @@ export async function getNextInvoiceNumber(userId: string): Promise<string> {
     .select({ invoiceNumber: invoices.invoiceNumber })
     .from(invoices)
     .where(
-      and(eq(invoices.userId, userId), like(invoices.invoiceNumber, `${prefix}%`))
+      and(
+        eq(invoices.userId, userId),
+        like(invoices.invoiceNumber, `${prefix}%`)
+      )
     )
     .orderBy(desc(invoices.invoiceNumber))
     .limit(1);
@@ -274,4 +277,15 @@ export async function getInvoiceById(
       amount: item.amount,
     })),
   };
+}
+
+export async function updateInvoiceStatus(
+  userId: string,
+  invoiceId: string,
+  status: "draft" | "sent" | "paid" | "overdue" | "cancelled"
+): Promise<void> {
+  await db
+    .update(invoices)
+    .set({ status })
+    .where(and(eq(invoices.id, invoiceId), eq(invoices.userId, userId)));
 }
