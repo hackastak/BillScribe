@@ -1,6 +1,6 @@
 import { db } from "@/lib/db";
 import { invoices, invoiceItems, clients } from "@/lib/db/schema";
-import { eq, desc, sql, and, like } from "drizzle-orm";
+import { eq, desc, asc, sql, and, like, ilike, or, inArray } from "drizzle-orm";
 
 export type InvoiceStats = {
   totalInvoices: number;
@@ -156,19 +156,75 @@ export async function createInvoice(
   });
 }
 
+export async function updateInvoice(
+  userId: string,
+  invoiceId: string,
+  data: CreateInvoiceData
+): Promise<void> {
+  await db.transaction(async (tx) => {
+    // Verify ownership
+    const existing = await tx
+      .select({ id: invoices.id })
+      .from(invoices)
+      .where(and(eq(invoices.id, invoiceId), eq(invoices.userId, userId)))
+      .limit(1);
+
+    if (existing.length === 0) {
+      throw new Error("Invoice not found");
+    }
+
+    // Update invoice
+    await tx
+      .update(invoices)
+      .set({
+        clientId: data.clientId || null,
+        invoiceNumber: data.invoiceNumber,
+        issueDate: data.issueDate,
+        dueDate: data.dueDate || null,
+        subtotal: data.subtotal,
+        taxRate: data.taxRate || null,
+        taxAmount: data.taxAmount || null,
+        total: data.total,
+        notes: data.notes || null,
+        updatedAt: new Date(),
+      })
+      .where(eq(invoices.id, invoiceId));
+
+    // Replace items
+    await tx.delete(invoiceItems).where(eq(invoiceItems.invoiceId, invoiceId));
+
+    if (data.items.length > 0) {
+      await tx.insert(invoiceItems).values(
+        data.items.map((item) => ({
+          invoiceId: invoiceId,
+          description: item.description,
+          quantity: item.quantity,
+          unitPrice: item.unitPrice,
+          amount: item.amount,
+        }))
+      );
+    }
+  });
+}
+
 export async function checkInvoiceNumberExists(
   userId: string,
-  invoiceNumber: string
+  invoiceNumber: string,
+  excludeId?: string
 ): Promise<boolean> {
+  const conditions = [
+    eq(invoices.userId, userId),
+    eq(invoices.invoiceNumber, invoiceNumber),
+  ];
+
+  if (excludeId) {
+    conditions.push(sql`${invoices.id} != ${excludeId}`);
+  }
+
   const result = await db
     .select({ id: invoices.id })
     .from(invoices)
-    .where(
-      and(
-        eq(invoices.userId, userId),
-        eq(invoices.invoiceNumber, invoiceNumber)
-      )
-    )
+    .where(and(...conditions))
     .limit(1);
 
   return result.length > 0;
@@ -288,4 +344,195 @@ export async function updateInvoiceStatus(
     .update(invoices)
     .set({ status })
     .where(and(eq(invoices.id, invoiceId), eq(invoices.userId, userId)));
+}
+
+export type InvoiceFilterParams = {
+  query?: string;
+  status?: string;
+  sort?: string; // "date-asc", "date-desc", "amount-asc", "amount-desc"
+  page?: number;
+  pageSize?: number;
+};
+
+export type PaginatedInvoices = {
+  data: InvoiceWithDetails[];
+  metadata: {
+    total: number;
+    page: number;
+    pageSize: number;
+    totalPages: number;
+  };
+};
+
+export async function getInvoices(
+  userId: string,
+  params: InvoiceFilterParams
+): Promise<PaginatedInvoices> {
+  const page = params.page || 1;
+  const pageSize = params.pageSize || 10;
+  const offset = (page - 1) * pageSize;
+
+  const conditions = [eq(invoices.userId, userId)];
+
+  if (params.status && params.status !== "all") {
+    conditions.push(eq(invoices.status, params.status as any));
+  }
+
+  if (params.query) {
+    const search = `%${params.query}%`;
+    const searchCondition = or(
+      ilike(invoices.invoiceNumber, search),
+      ilike(clients.name, search),
+      ilike(clients.company, search)
+    );
+    if (searchCondition) {
+      conditions.push(searchCondition);
+    }
+  }
+
+  const whereClause = conditions.length > 0 ? and(...conditions) : undefined;
+
+  // Get total count
+  const countResult = await db
+    .select({ count: sql<number>`count(*)` })
+    .from(invoices)
+    .leftJoin(clients, eq(invoices.clientId, clients.id))
+    .where(whereClause);
+
+  const total = Number(countResult[0]?.count || 0);
+  const totalPages = Math.ceil(total / pageSize);
+
+  // Build sort order
+  let orderBy;
+  switch (params.sort) {
+    case "date-asc":
+      orderBy = asc(invoices.issueDate);
+      break;
+    case "date-desc":
+      orderBy = desc(invoices.issueDate);
+      break;
+    case "amount-asc":
+      orderBy = asc(invoices.total);
+      break;
+    case "amount-desc":
+      orderBy = desc(invoices.total);
+      break;
+    default:
+      orderBy = desc(invoices.issueDate);
+  }
+
+  // Get data
+  const result = await db
+    .select({
+      id: invoices.id,
+      invoiceNumber: invoices.invoiceNumber,
+      status: invoices.status,
+      issueDate: invoices.issueDate,
+      dueDate: invoices.dueDate,
+      subtotal: invoices.subtotal,
+      taxRate: invoices.taxRate,
+      taxAmount: invoices.taxAmount,
+      total: invoices.total,
+      notes: invoices.notes,
+      clientId: clients.id,
+      clientName: clients.name,
+      clientEmail: clients.email,
+      clientPhone: clients.phone,
+      clientCompany: clients.company,
+      clientAddress: clients.address,
+    })
+    .from(invoices)
+    .leftJoin(clients, eq(invoices.clientId, clients.id))
+    .where(whereClause)
+    .orderBy(orderBy)
+    .limit(pageSize)
+    .offset(offset);
+
+  // Fetch items for these invoices
+  // Note: For a list view, we might not need items, but the InvoiceWithDetails type includes them.
+  // To avoid N+1, we can fetch all items for these invoice IDs and map them.
+  // However, for just the table view, we usually don't need items.
+  // But since the "Preview" needs them, we might as well fetch them if it's not too heavy,
+  // or we can make items optional in a new type.
+  // For now, to reuse types, I'll fetch them.
+
+  const invoiceIds = result.map((inv) => inv.id);
+
+  const data = result.map((row) => {
+    // Find items for this invoice
+    // Note: This is in-memory matching, which is fine for page size 10-50.
+    // We need to match invoiceId.
+    // Wait, 'allItems' in my previous query logic doesn't have invoiceId in the generic map.
+    // I need to make sure I can access invoiceId from the query result.
+
+    // Let's refine the items fetching logic slightly.
+    // I'll re-query items including invoiceId to match them.
+
+    return {
+      id: row.id,
+      invoiceNumber: row.invoiceNumber,
+      status: row.status,
+      issueDate: row.issueDate,
+      dueDate: row.dueDate,
+      subtotal: row.subtotal,
+      taxRate: row.taxRate,
+      taxAmount: row.taxAmount,
+      total: row.total ?? "0",
+      notes: row.notes,
+      client: row.clientId
+        ? {
+            id: row.clientId,
+            name: row.clientName!,
+            email: row.clientEmail,
+            phone: row.clientPhone,
+            company: row.clientCompany,
+            address: row.clientAddress,
+          }
+        : null,
+      items: [] as InvoiceItem[],
+    };
+  });
+
+  // Correct approach for items:
+  if (invoiceIds.length > 0) {
+    const itemsResult = await db
+      .select({
+        id: invoiceItems.id,
+        invoiceId: invoiceItems.invoiceId,
+        description: invoiceItems.description,
+        quantity: invoiceItems.quantity,
+        unitPrice: invoiceItems.unitPrice,
+        amount: invoiceItems.amount,
+      })
+      .from(invoiceItems)
+      .where(inArray(invoiceItems.invoiceId, invoiceIds));
+
+    const itemsByInvoice: Record<string, InvoiceItem[]> = {};
+    itemsResult.forEach((item) => {
+      if (!itemsByInvoice[item.invoiceId]) {
+        itemsByInvoice[item.invoiceId] = [];
+      }
+      itemsByInvoice[item.invoiceId]?.push({
+        id: item.id,
+        description: item.description,
+        quantity: item.quantity,
+        unitPrice: item.unitPrice,
+        amount: item.amount,
+      });
+    });
+
+    data.forEach((inv) => {
+      inv.items = itemsByInvoice[inv.id] || [];
+    });
+  }
+
+  return {
+    data,
+    metadata: {
+      total,
+      page,
+      pageSize,
+      totalPages,
+    },
+  };
 }

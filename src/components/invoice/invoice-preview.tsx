@@ -6,7 +6,11 @@ import { useFormStatus } from "react-dom";
 import Image from "next/image";
 import { Button } from "@/components/ui/button";
 import { Spinner } from "@/components/ui/spinner";
-import { createInvoiceAction, type InvoiceActionState } from "@/actions/invoice";
+import {
+  createInvoiceAction,
+  updateInvoiceAction,
+  type InvoiceActionState,
+} from "@/actions/invoice";
 import type { Profile } from "@/lib/db/queries/profiles";
 import type { LineItem } from "./line-items";
 
@@ -32,17 +36,24 @@ export type InvoicePreviewData = {
 };
 
 interface InvoicePreviewProps {
+  invoiceId?: string;
   profile: Profile | null;
   data: InvoicePreviewData;
   onClose: () => void;
   onSuccess: () => void;
 }
 
-function SubmitButton() {
+function SubmitButton({ isEditing }: { isEditing: boolean }) {
   const { pending } = useFormStatus();
   return (
     <Button type="submit" disabled={pending}>
-      {pending ? <Spinner size="sm" /> : "Create Invoice"}
+      {pending ? (
+        <Spinner size="sm" />
+      ) : isEditing ? (
+        "Update Invoice"
+      ) : (
+        "Create Invoice"
+      )}
     </Button>
   );
 }
@@ -63,6 +74,7 @@ function formatDate(dateStr: string) {
 }
 
 export function InvoicePreviewContent({
+  invoiceId,
   profile,
   data,
   onClose,
@@ -72,7 +84,9 @@ export function InvoicePreviewContent({
 
   const [state, formAction] = useActionState<InvoiceActionState, FormData>(
     async (prevState, formData) => {
-      const result = await createInvoiceAction(prevState, formData);
+      const result = invoiceId
+        ? await updateInvoiceAction(invoiceId, prevState, formData)
+        : await createInvoiceAction(prevState, formData);
       if (result.success && result.invoiceId) {
         onSuccess();
         router.push(`/invoices/${result.invoiceId}`);
@@ -235,9 +249,7 @@ export function InvoicePreviewContent({
             </div>
             {parseFloat(data.taxRate) > 0 && (
               <div className="flex justify-between text-sm">
-                <span className="text-neutral-600">
-                  Tax ({data.taxRate}%)
-                </span>
+                <span className="text-neutral-600">Tax ({data.taxRate}%)</span>
                 <span className="font-medium">${data.taxAmount}</span>
               </div>
             )}
@@ -270,7 +282,11 @@ export function InvoicePreviewContent({
 
         <form action={formAction}>
           <input type="hidden" name="clientId" value={data.clientId || ""} />
-          <input type="hidden" name="invoiceNumber" value={data.invoiceNumber} />
+          <input
+            type="hidden"
+            name="invoiceNumber"
+            value={data.invoiceNumber}
+          />
           <input type="hidden" name="issueDate" value={data.issueDate} />
           <input type="hidden" name="dueDate" value={data.dueDate} />
           <input type="hidden" name="taxRate" value={data.taxRate} />
@@ -280,7 +296,7 @@ export function InvoicePreviewContent({
             name="items"
             value={JSON.stringify(data.items)}
           />
-          <SubmitButton />
+          <SubmitButton isEditing={!!invoiceId} />
         </form>
       </div>
     </div>

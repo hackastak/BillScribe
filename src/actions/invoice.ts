@@ -5,6 +5,7 @@ import { revalidatePath } from "next/cache";
 import { invoiceSchema } from "@/lib/validations/invoice";
 import {
   createInvoice as createDbInvoice,
+  updateInvoice as updateDbInvoice,
   checkInvoiceNumberExists,
   updateInvoiceStatus,
 } from "@/lib/db/queries/invoices";
@@ -106,6 +107,99 @@ export async function createInvoiceAction(
   }
 }
 
+export async function updateInvoiceAction(
+  invoiceId: string,
+  prevState: InvoiceActionState,
+  formData: FormData
+): Promise<InvoiceActionState> {
+  const supabase = await createClient();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+
+  if (!user) {
+    return { error: "You must be logged in to update an invoice" };
+  }
+
+  const itemsJson = formData.get("items")?.toString() || "[]";
+  let items;
+  try {
+    items = JSON.parse(itemsJson);
+  } catch {
+    return { error: "Invalid line items data" };
+  }
+
+  const rawData = {
+    clientId: formData.get("clientId")?.toString() || undefined,
+    invoiceNumber: formData.get("invoiceNumber")?.toString() || "",
+    issueDate: formData.get("issueDate")?.toString() || "",
+    dueDate: formData.get("dueDate")?.toString() || undefined,
+    taxRate: formData.get("taxRate")?.toString() || undefined,
+    notes: formData.get("notes")?.toString() || undefined,
+    items,
+  };
+
+  const validated = invoiceSchema.safeParse(rawData);
+  if (!validated.success) {
+    return {
+      fieldErrors: validated.error.flatten().fieldErrors as Record<
+        string,
+        string[]
+      >,
+    };
+  }
+
+  const exists = await checkInvoiceNumberExists(
+    user.id,
+    validated.data.invoiceNumber,
+    invoiceId
+  );
+  if (exists) {
+    return {
+      fieldErrors: {
+        invoiceNumber: ["This invoice number already exists"],
+      },
+    };
+  }
+
+  const subtotal = validated.data.items.reduce(
+    (sum, item) => sum + parseFloat(item.amount),
+    0
+  );
+  const taxRate = validated.data.taxRate
+    ? parseFloat(validated.data.taxRate)
+    : 0;
+  const taxAmount = subtotal * (taxRate / 100);
+  const total = subtotal + taxAmount;
+
+  try {
+    await updateDbInvoice(user.id, invoiceId, {
+      clientId: validated.data.clientId,
+      invoiceNumber: validated.data.invoiceNumber,
+      issueDate: validated.data.issueDate,
+      dueDate: validated.data.dueDate,
+      subtotal: subtotal.toFixed(2),
+      taxRate: validated.data.taxRate,
+      taxAmount: taxAmount.toFixed(2),
+      total: total.toFixed(2),
+      notes: validated.data.notes,
+      items: validated.data.items.map((item) => ({
+        description: item.description,
+        quantity: item.quantity,
+        unitPrice: item.unitPrice,
+        amount: item.amount,
+      })),
+    });
+
+    revalidatePath("/invoices");
+    revalidatePath(`/invoices/${invoiceId}`);
+    return { success: true, invoiceId };
+  } catch (error) {
+    console.error("Error updating invoice:", error);
+    return { error: "Failed to update invoice. Please try again." };
+  }
+}
+
 export type LogoUploadState = {
   error?: string;
   success?: boolean;
@@ -181,6 +275,7 @@ export async function updateInvoiceStatusAction(
   try {
     await updateInvoiceStatus(user.id, invoiceId, status);
     revalidatePath("/dashboard");
+    revalidatePath("/invoices");
     revalidatePath(`/invoices/${invoiceId}`);
     return { success: true };
   } catch (error) {

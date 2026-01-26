@@ -16,37 +16,48 @@ import {
 } from "./invoice-preview";
 import type { Client } from "@/lib/db/queries/clients";
 import type { Profile } from "@/lib/db/queries/profiles";
+import type { InvoiceWithDetails } from "@/lib/db/queries/invoices";
 
 interface InvoiceFormProps {
   clients: Client[];
   nextInvoiceNumber: string;
   profile: Profile | null;
+  invoice?: InvoiceWithDetails;
 }
 
 export function InvoiceForm({
   clients,
   nextInvoiceNumber,
   profile,
+  invoice,
 }: InvoiceFormProps) {
   const router = useRouter();
   const [clientList, setClientList] = useState<Client[]>(clients);
-  const [selectedClientId, setSelectedClientId] = useState<string>("");
-  const [invoiceNumber, setInvoiceNumber] = useState<string>(nextInvoiceNumber);
-  const [issueDate, setIssueDate] = useState<string>(
-    new Date().toISOString().split("T")[0] ?? ""
+  const [selectedClientId, setSelectedClientId] = useState<string>(
+    invoice?.client?.id || ""
   );
-  const [dueDate, setDueDate] = useState<string>("");
-  const [taxRate, setTaxRate] = useState<string>("");
-  const [notes, setNotes] = useState<string>("");
-  const [items, setItems] = useState<LineItem[]>([
-    {
-      id: crypto.randomUUID(),
-      description: "",
-      quantity: "1",
-      unitPrice: "",
-      amount: "0.00",
-    },
-  ]);
+  const [invoiceNumber, setInvoiceNumber] = useState<string>(
+    invoice?.invoiceNumber || nextInvoiceNumber
+  );
+  const [issueDate, setIssueDate] = useState<string>(
+    (invoice?.issueDate || new Date().toISOString().split("T")[0]) ?? ""
+  );
+  const [dueDate, setDueDate] = useState<string>(invoice?.dueDate || "");
+  const [taxRate, setTaxRate] = useState<string>(invoice?.taxRate || "");
+  const [notes, setNotes] = useState<string>(invoice?.notes || "");
+  const [items, setItems] = useState<LineItem[]>(
+    invoice?.items && invoice.items.length > 0
+      ? invoice.items
+      : [
+          {
+            id: crypto.randomUUID(),
+            description: "",
+            quantity: "1",
+            unitPrice: "",
+            amount: "0.00",
+          },
+        ]
+  );
   const [errors, setErrors] = useState<Record<string, string[]>>({});
   const [showPreview, setShowPreview] = useState(false);
 
@@ -200,7 +211,9 @@ export function InvoiceForm({
                     error={!!errors.dueDate}
                   />
                   {errors.dueDate && (
-                    <p className="text-sm text-error-600">{errors.dueDate[0]}</p>
+                    <p className="text-sm text-error-600">
+                      {errors.dueDate[0]}
+                    </p>
                   )}
                 </div>
               </div>
@@ -248,7 +261,9 @@ export function InvoiceForm({
                 {parseFloat(taxRate) > 0 && (
                   <div className="flex justify-between text-sm">
                     <span className="text-neutral-600">Tax ({taxRate}%)</span>
-                    <span className="font-medium">${calculations.taxAmount}</span>
+                    <span className="font-medium">
+                      ${calculations.taxAmount}
+                    </span>
                   </div>
                 )}
                 <div className="border-t border-neutral-200 pt-2 flex justify-between">
@@ -263,7 +278,11 @@ export function InvoiceForm({
         </Card>
 
         <div className="flex justify-end gap-3">
-          <Button type="button" variant="secondary" onClick={() => router.back()}>
+          <Button
+            type="button"
+            variant="secondary"
+            onClick={() => router.back()}
+          >
             Cancel
           </Button>
           <Button type="button" onClick={handlePreview}>
@@ -274,6 +293,7 @@ export function InvoiceForm({
 
       <Modal isOpen={showPreview} onClose={() => setShowPreview(false)}>
         <InvoicePreviewContent
+          invoiceId={invoice?.id}
           profile={profile}
           data={getPreviewData()}
           onClose={() => setShowPreview(false)}
