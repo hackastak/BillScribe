@@ -1,5 +1,6 @@
 "use client";
 
+import { useRef, useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
@@ -7,6 +8,8 @@ import { Card } from "@/components/ui/card";
 import type { Profile } from "@/lib/db/queries/profiles";
 import type { InvoiceWithDetails } from "@/lib/db/queries/invoices";
 import { InvoiceStatusSelect } from "@/components/invoice/invoice-status-select";
+import html2canvas from "html2canvas";
+import jsPDF from "jspdf";
 
 interface InvoiceViewProps {
   invoice: InvoiceWithDetails;
@@ -33,6 +36,53 @@ export function InvoiceView({
   profile,
   showBackLink = true,
 }: InvoiceViewProps) {
+  const invoiceRef = useRef<HTMLDivElement>(null);
+  const [isDownloading, setIsDownloading] = useState(false);
+
+  const handleDownloadPdf = async () => {
+    if (!invoiceRef.current) return;
+
+    try {
+      setIsDownloading(true);
+      const canvas = await html2canvas(invoiceRef.current, {
+        scale: 2, // Improve quality
+        useCORS: true, // Handle cross-origin images
+        logging: false,
+        backgroundColor: "#ffffff",
+      });
+
+      const imgData = canvas.toDataURL("image/png");
+      const pdf = new jsPDF({
+        orientation: "portrait",
+        unit: "mm",
+        format: "a4",
+      });
+
+      const imgWidth = 210; // A4 width in mm
+      const pageHeight = 297; // A4 height in mm
+      const imgHeight = (canvas.height * imgWidth) / canvas.width;
+      let heightLeft = imgHeight;
+      let position = 0;
+
+      pdf.addImage(imgData, "PNG", 0, position, imgWidth, imgHeight);
+      heightLeft -= pageHeight;
+
+      // Handle multi-page invoices if necessary (basic implementation)
+      while (heightLeft >= 0) {
+        position = heightLeft - imgHeight;
+        pdf.addPage();
+        pdf.addImage(imgData, "PNG", 0, position, imgWidth, imgHeight);
+        heightLeft -= pageHeight;
+      }
+
+      pdf.save(`invoice-${invoice.invoiceNumber}.pdf`);
+    } catch (error) {
+      console.error("Error generating PDF:", error);
+    } finally {
+      setIsDownloading(false);
+    }
+  };
+
   return (
     <div className="space-y-6">
       <div className="flex items-center justify-between">
@@ -66,8 +116,13 @@ export function InvoiceView({
           />
         </div>
         <div className="flex items-center gap-3 mr-12">
-          <Button variant="secondary" size="sm">
-            Download PDF
+          <Button
+            variant="secondary"
+            size="sm"
+            onClick={handleDownloadPdf}
+            disabled={isDownloading}
+          >
+            {isDownloading ? "Generating..." : "Download PDF"}
           </Button>
           <Button variant="secondary" size="sm">
             Send Invoice
@@ -75,7 +130,7 @@ export function InvoiceView({
         </div>
       </div>
 
-      <Card className="p-8">
+      <Card className="p-8" ref={invoiceRef}>
         <div className="space-y-8">
           {/* Header */}
           <div className="flex justify-between items-start">
