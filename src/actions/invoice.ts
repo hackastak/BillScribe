@@ -8,6 +8,7 @@ import {
   updateInvoice as updateDbInvoice,
   checkInvoiceNumberExists,
   updateInvoiceStatus,
+  deleteInvoice,
 } from "@/lib/db/queries/invoices";
 import { updateProfile } from "@/lib/db/queries/profiles";
 
@@ -281,5 +282,31 @@ export async function updateInvoiceStatusAction(
   } catch (error) {
     console.error("Error updating invoice status:", error);
     return { error: "Failed to update invoice status" };
+  }
+}
+
+export async function deleteInvoiceAction(invoiceId: string) {
+  const supabase = await createClient();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+
+  if (!user) {
+    return { error: "You must be logged in to delete an invoice" };
+  }
+
+  try {
+    const result = await deleteInvoice(user.id, invoiceId);
+
+    if (!result.success) {
+      return { error: result.error };
+    }
+
+    revalidatePath("/dashboard");
+    revalidatePath("/invoices");
+    return { success: true };
+  } catch (error) {
+    console.error("Error deleting invoice:", error);
+    return { error: "Failed to delete invoice. Please try again." };
   }
 }

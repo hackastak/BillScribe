@@ -104,7 +104,7 @@ export function InvoicePreviewContent({
         </div>
       )}
 
-      <div className="space-y-8">
+      <div className="space-y-8 mt-8">
         {/* Header */}
         <div className="flex justify-between items-start">
           <div>

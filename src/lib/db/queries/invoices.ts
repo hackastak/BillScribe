@@ -346,6 +346,36 @@ export async function updateInvoiceStatus(
     .where(and(eq(invoices.id, invoiceId), eq(invoices.userId, userId)));
 }
 
+export async function deleteInvoice(
+  userId: string,
+  invoiceId: string
+): Promise<{ success: boolean; error?: string }> {
+  // Verify ownership and check status
+  const existing = await db
+    .select({ id: invoices.id, status: invoices.status })
+    .from(invoices)
+    .where(and(eq(invoices.id, invoiceId), eq(invoices.userId, userId)))
+    .limit(1);
+
+  if (existing.length === 0) {
+    return { success: false, error: "Invoice not found" };
+  }
+
+  if (existing[0]?.status !== "draft") {
+    return {
+      success: false,
+      error: "Only draft invoices can be deleted",
+    };
+  }
+
+  // Delete invoice (invoice_items will be cascade deleted due to foreign key constraint)
+  await db
+    .delete(invoices)
+    .where(and(eq(invoices.id, invoiceId), eq(invoices.userId, userId)));
+
+  return { success: true };
+}
+
 export type InvoiceFilterParams = {
   query?: string;
   status?: string;
