@@ -205,7 +205,7 @@ export function InvoicesTable({
                         >
                           Preview
                         </Button>
-                        <Link href={`/invoices/${invoice.id}`}>
+                        <Link href={`/invoices/${invoice.id}/edit`}>
                           <Button variant="secondary" size="sm">
                             Edit
                           </Button>

@@ -15,9 +15,15 @@ interface LineItemsProps {
   items: LineItem[];
   onItemsChange: (items: LineItem[]) => void;
   errors?: Record<string, string[]>;
+  disabled?: boolean;
 }
 
-export function LineItems({ items, onItemsChange, errors }: LineItemsProps) {
+export function LineItems({
+  items,
+  onItemsChange,
+  errors,
+  disabled,
+}: LineItemsProps) {
   const addItem = () => {
     const newItem: LineItem = {
       id: crypto.randomUUID(),
@@ -56,7 +62,13 @@ export function LineItems({ items, onItemsChange, errors }: LineItemsProps) {
     <div className="space-y-3">
       <div className="flex items-center justify-between">
         <h3 className="text-sm font-medium text-neutral-900">Line Items</h3>
-        <Button type="button" variant="secondary" size="sm" onClick={addItem}>
+        <Button
+          type="button"
+          variant="secondary"
+          size="sm"
+          onClick={addItem}
+          disabled={disabled}
+        >
           + Add Item
         </Button>
       </div>
@@ -96,6 +108,7 @@ export function LineItems({ items, onItemsChange, errors }: LineItemsProps) {
                     placeholder="Item description"
                     className="h-8 text-sm"
                     error={!!errors?.[`items.${index}.description`]}
+                    disabled={disabled}
                   />
                 </td>
                 <td className="px-3 py-2">
@@ -109,6 +122,7 @@ export function LineItems({ items, onItemsChange, errors }: LineItemsProps) {
                     }
                     className="h-8 text-sm"
                     error={!!errors?.[`items.${index}.quantity`]}
+                    disabled={disabled}
                   />
                 </td>
                 <td className="px-3 py-2">
@@ -123,6 +137,7 @@ export function LineItems({ items, onItemsChange, errors }: LineItemsProps) {
                     placeholder="0.00"
                     className="h-8 text-sm"
                     error={!!errors?.[`items.${index}.unitPrice`]}
+                    disabled={disabled}
                   />
                 </td>
                 <td className="px-3 py-2 text-right">
@@ -134,7 +149,7 @@ export function LineItems({ items, onItemsChange, errors }: LineItemsProps) {
                   <button
                     type="button"
                     onClick={() => removeItem(item.id)}
-                    disabled={items.length === 1}
+                    disabled={items.length === 1 || disabled}
                     className="text-neutral-400 hover:text-error-600 disabled:cursor-not-allowed disabled:opacity-50"
                     aria-label="Remove item"
                   >

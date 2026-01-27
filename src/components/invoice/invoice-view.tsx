@@ -127,6 +127,11 @@ export function InvoiceView({
           <Button variant="secondary" size="sm">
             Send Invoice
           </Button>
+          <Link href={`/invoices/${invoice.id}/edit`}>
+            <Button variant="secondary" size="sm">
+              Edit Invoice
+            </Button>
+          </Link>
         </div>
       </div>
 

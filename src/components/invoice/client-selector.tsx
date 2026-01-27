@@ -16,6 +16,7 @@ interface ClientSelectorProps {
   selectedClientId: string;
   onClientSelect: (clientId: string) => void;
   onClientCreated: (client: Client) => void;
+  disabled?: boolean;
 }
 
 function SubmitButton() {
@@ -32,6 +33,7 @@ export function ClientSelector({
   selectedClientId,
   onClientSelect,
   onClientCreated,
+  disabled,
 }: ClientSelectorProps) {
   const [showNewClientForm, setShowNewClientForm] = useState(false);
   const [state, formAction] = useActionState<ClientActionState, FormData>(
@@ -65,6 +67,7 @@ export function ClientSelector({
           id="clientSelect"
           value={showNewClientForm ? "new" : selectedClientId}
           onChange={handleSelectChange}
+          disabled={disabled}
         >
           <option value="">Select a client</option>
           {clients.map((client) => (
@@ -73,7 +76,7 @@ export function ClientSelector({
               {client.company ? ` (${client.company})` : ""}
             </option>
           ))}
-          <option value="new">+ Add new client</option>
+          {!disabled && <option value="new">+ Add new client</option>}
         </Select>
       </div>
 

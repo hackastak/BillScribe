@@ -77,6 +77,8 @@ export function InvoiceForm({
     };
   }, [items, taxRate]);
 
+  const isReadOnly = invoice && invoice.status !== "draft";
+
   const handleClientCreated = (client: Client) => {
     setClientList((prev) => [...prev, client]);
     setSelectedClientId(client.id);
@@ -159,6 +161,38 @@ export function InvoiceForm({
   return (
     <>
       <div className="space-y-6">
+        {isReadOnly && (
+          <div className="rounded-lg bg-yellow-50 border border-yellow-200 p-4">
+            <div className="flex">
+              <div className="flex-shrink-0">
+                <svg
+                  className="h-5 w-5 text-yellow-400"
+                  viewBox="0 0 20 20"
+                  fill="currentColor"
+                >
+                  <path
+                    fillRule="evenodd"
+                    d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z"
+                    clipRule="evenodd"
+                  />
+                </svg>
+              </div>
+              <div className="ml-3">
+                <h3 className="text-sm font-medium text-yellow-800">
+                  Editing Restricted
+                </h3>
+                <div className="mt-2 text-sm text-yellow-700">
+                  <p>
+                    This invoice cannot be edited because it is currently marked
+                    as <strong>{invoice.status}</strong>. Only draft invoices
+                    can be edited.
+                  </p>
+                </div>
+              </div>
+            </div>
+          </div>
+        )}
+
         <Card>
           <div className="grid gap-6 md:grid-cols-2">
             <ClientSelector
@@ -166,6 +200,7 @@ export function InvoiceForm({
               selectedClientId={selectedClientId}
               onClientSelect={setSelectedClientId}
               onClientCreated={handleClientCreated}
+              disabled={isReadOnly}
             />
 
             <div className="space-y-4">
@@ -177,6 +212,7 @@ export function InvoiceForm({
                   onChange={(e) => setInvoiceNumber(e.target.value)}
                   placeholder="INV-2026-0001"
                   error={!!errors.invoiceNumber}
+                  disabled={isReadOnly}
                 />
                 {errors.invoiceNumber && (
                   <p className="text-sm text-error-600">
@@ -194,6 +230,7 @@ export function InvoiceForm({
                     value={issueDate}
                     onChange={(e) => setIssueDate(e.target.value)}
                     error={!!errors.issueDate}
+                    disabled={isReadOnly}
                   />
                   {errors.issueDate && (
                     <p className="text-sm text-error-600">
@@ -209,6 +246,7 @@ export function InvoiceForm({
                     value={dueDate}
                     onChange={(e) => setDueDate(e.target.value)}
                     error={!!errors.dueDate}
+                    disabled={isReadOnly}
                   />
                   {errors.dueDate && (
                     <p className="text-sm text-error-600">
@@ -222,7 +260,12 @@ export function InvoiceForm({
         </Card>
 
         <Card>
-          <LineItems items={items} onItemsChange={setItems} errors={errors} />
+          <LineItems
+            items={items}
+            onItemsChange={setItems}
+            errors={errors}
+            disabled={isReadOnly}
+          />
         </Card>
 
         <Card>
@@ -235,6 +278,7 @@ export function InvoiceForm({
                 onChange={(e) => setNotes(e.target.value)}
                 placeholder="Payment terms, thank you message, or any additional notes..."
                 rows={4}
+                disabled={isReadOnly}
               />
             </div>
 
@@ -250,6 +294,7 @@ export function InvoiceForm({
                   value={taxRate}
                   onChange={(e) => setTaxRate(e.target.value)}
                   placeholder="0.00"
+                  disabled={isReadOnly}
                 />
               </div>
 
@@ -283,11 +328,13 @@ export function InvoiceForm({
             variant="secondary"
             onClick={() => router.back()}
           >
-            Cancel
+            {isReadOnly ? "Go Back" : "Cancel"}
           </Button>
-          <Button type="button" onClick={handlePreview}>
-            Preview Invoice
-          </Button>
+          {!isReadOnly && (
+            <Button type="button" onClick={handlePreview}>
+              Preview Invoice
+            </Button>
+          )}
         </div>
       </div>
 
