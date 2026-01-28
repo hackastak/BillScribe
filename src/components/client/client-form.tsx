@@ -1,6 +1,6 @@
 "use client";
 
-import { useActionState } from "react";
+import { useActionState, useTransition } from "react";
 import { useRouter } from "next/navigation";
 import { useFormStatus } from "react-dom";
 import { Button } from "@/components/ui/button";
@@ -11,6 +11,7 @@ import { Spinner } from "@/components/ui/spinner";
 import {
   createClientAction,
   updateClientAction,
+  toggleClientStatusAction,
   type ClientActionState,
 } from "@/actions/client";
 import type { Client } from "@/lib/db/queries/clients";
@@ -31,6 +32,14 @@ function SubmitButton({ isEdit }: { isEdit: boolean }) {
 export function ClientForm({ client }: ClientFormProps) {
   const router = useRouter();
   const isEdit = !!client;
+  const [, startTransition] = useTransition();
+
+  const handleToggleStatus = (clientId: string) => {
+    startTransition(async () => {
+      await toggleClientStatusAction(clientId);
+      router.push("/clients");
+    });
+  };
 
   const [state, formAction] = useActionState<ClientActionState, FormData>(
     async (prevState, formData) => {
@@ -133,12 +142,15 @@ export function ClientForm({ client }: ClientFormProps) {
       </div>
       <div className="flex justify-between">
         <div className="flex">
-          <Button
-            variant={client.status === "active" ? "destructive" : "secondary"}
-            onClick={() => handleToggleStatus(client.id)}
-          >
-            {client.status === "active" ? "Deactivate" : "Activate"}
-          </Button>
+          {isEdit && (
+            <Button
+              type="button"
+              variant={client.status === "active" ? "destructive" : "secondary"}
+              onClick={() => handleToggleStatus(client.id)}
+            >
+              {client.status === "active" ? "Deactivate" : "Activate"}
+            </Button>
+          )}
         </div>
         <div className="flex gap-3">
           <Button type="button" variant="ghost" onClick={() => router.back()}>
