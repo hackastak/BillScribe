@@ -1,6 +1,6 @@
 import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
-import { getClients } from "@/lib/db/queries/clients";
+import { getActiveClients } from "@/lib/db/queries/clients";
 import { getNextInvoiceNumber } from "@/lib/db/queries/invoices";
 import { getProfile } from "@/lib/db/queries/profiles";
 import { InvoiceForm } from "@/components/invoice/invoice-form";
@@ -16,7 +16,7 @@ export default async function NewInvoicePage() {
   }
 
   const [clients, nextInvoiceNumber, profile] = await Promise.all([
-    getClients(user.id),
+    getActiveClients(user.id),
     getNextInvoiceNumber(user.id),
     getProfile(user.id),
   ]);

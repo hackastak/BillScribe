@@ -12,7 +12,7 @@ import { useFormStatus } from "react-dom";
 import type { Client } from "@/lib/db/queries/clients";
 
 interface ClientSelectorProps {
-  clients: Client[];
+  clients: Client[]; // Should be pre-filtered to only active clients
   selectedClientId: string;
   onClientSelect: (clientId: string) => void;
   onClientCreated: (client: Client) => void;

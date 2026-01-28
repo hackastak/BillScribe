@@ -566,3 +566,32 @@ export async function getInvoices(
     },
   };
 }
+
+export type ClientInvoiceStats = {
+  totalInvoices: number;
+  paidAmount: number;
+  pendingAmount: number;
+  overdueAmount: number;
+};
+
+export async function getClientInvoiceStats(
+  userId: string,
+  clientId: string
+): Promise<ClientInvoiceStats> {
+  const result = await db
+    .select({
+      totalInvoices: sql<number>`count(*)::int`,
+      paidAmount: sql<number>`coalesce(sum(${invoices.total}) filter (where ${invoices.status} = 'paid'), 0)::numeric`,
+      pendingAmount: sql<number>`coalesce(sum(${invoices.total}) filter (where ${invoices.status} in ('draft', 'sent')), 0)::numeric`,
+      overdueAmount: sql<number>`coalesce(sum(${invoices.total}) filter (where ${invoices.status} = 'overdue'), 0)::numeric`,
+    })
+    .from(invoices)
+    .where(and(eq(invoices.userId, userId), eq(invoices.clientId, clientId)));
+
+  return {
+    totalInvoices: result[0]?.totalInvoices ?? 0,
+    paidAmount: Number(result[0]?.paidAmount ?? 0),
+    pendingAmount: Number(result[0]?.pendingAmount ?? 0),
+    overdueAmount: Number(result[0]?.overdueAmount ?? 0),
+  };
+}

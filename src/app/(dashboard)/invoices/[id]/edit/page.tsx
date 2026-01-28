@@ -1,6 +1,6 @@
 import { redirect, notFound } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
-import { getClients } from "@/lib/db/queries/clients";
+import { getActiveClients } from "@/lib/db/queries/clients";
 import {
   getNextInvoiceNumber,
   getInvoiceById,
@@ -27,7 +27,7 @@ export default async function EditInvoicePage({
   const { id } = await params;
 
   const [clients, nextInvoiceNumber, profile, invoice] = await Promise.all([
-    getClients(user.id),
+    getActiveClients(user.id),
     getNextInvoiceNumber(user.id),
     getProfile(user.id),
     getInvoiceById(user.id, id),
