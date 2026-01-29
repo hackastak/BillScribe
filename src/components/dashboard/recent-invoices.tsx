@@ -45,7 +45,7 @@ export function RecentInvoices({ invoices }: RecentInvoicesProps) {
       <CardContent>
         {invoices.length === 0 ? (
           <div className="py-8 text-center">
-            <p className="text-neutral-600">No invoices yet</p>
+            <p className="text-[var(--color-fg-muted)]">No invoices yet</p>
             <Link
               href="/invoices/new"
               className="mt-2 inline-block text-sm font-medium text-primary-600 hover:text-primary-700"
@@ -57,20 +57,20 @@ export function RecentInvoices({ invoices }: RecentInvoicesProps) {
           <div className="overflow-x-auto">
             <table className="w-full">
               <thead>
-                <tr className="border-b border-neutral-200">
-                  <th className="pb-3 text-left text-sm font-medium text-neutral-600">
+                <tr className="border-b border-[var(--color-border-default)]">
+                  <th className="pb-3 text-left text-sm font-medium text-[var(--color-fg-muted)]">
                     Invoice
                   </th>
-                  <th className="pb-3 text-left text-sm font-medium text-neutral-600">
+                  <th className="pb-3 text-left text-sm font-medium text-[var(--color-fg-muted)]">
                     Client
                   </th>
-                  <th className="pb-3 text-left text-sm font-medium text-neutral-600">
+                  <th className="pb-3 text-left text-sm font-medium text-[var(--color-fg-muted)]">
                     Status
                   </th>
-                  <th className="pb-3 text-left text-sm font-medium text-neutral-600">
+                  <th className="pb-3 text-left text-sm font-medium text-[var(--color-fg-muted)]">
                     Date
                   </th>
-                  <th className="pb-3 text-right text-sm font-medium text-neutral-600">
+                  <th className="pb-3 text-right text-sm font-medium text-[var(--color-fg-muted)]">
                     Amount
                   </th>
                 </tr>
@@ -79,17 +79,17 @@ export function RecentInvoices({ invoices }: RecentInvoicesProps) {
                 {invoices.map((invoice) => (
                   <tr
                     key={invoice.id}
-                    className="border-b border-neutral-100 last:border-0"
+                    className="border-b border-[var(--color-border-muted)] last:border-0"
                   >
                     <td className="py-4">
                       <Link
                         href={`/invoices/${invoice.id}`}
-                        className="font-medium text-neutral-900 hover:text-primary-600"
+                        className="font-medium text-[var(--color-fg-default)] hover:text-primary-600"
                       >
                         {invoice.invoiceNumber}
                       </Link>
                     </td>
-                    <td className="py-4 text-neutral-600">
+                    <td className="py-4 text-[var(--color-fg-muted)]">
                       {invoice.clientName ?? "No client"}
                     </td>
                     <td className="py-4">
@@ -98,10 +98,10 @@ export function RecentInvoices({ invoices }: RecentInvoicesProps) {
                         initialStatus={invoice.status}
                       />
                     </td>
-                    <td className="py-4 text-neutral-600">
+                    <td className="py-4 text-[var(--color-fg-muted)]">
                       {formatDate(invoice.issueDate)}
                     </td>
-                    <td className="py-4 text-right font-medium text-neutral-900">
+                    <td className="py-4 text-right font-medium text-[var(--color-fg-default)]">
                       {formatCurrency(invoice.total)}
                     </td>
                   </tr>

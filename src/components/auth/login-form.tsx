@@ -89,7 +89,7 @@ export function LoginForm({ redirectTo }: LoginFormProps) {
 
       <SubmitButton />
 
-      <p className="text-center text-sm text-neutral-600">
+      <p className="text-center text-sm text-[var(--color-fg-muted)]">
         Don&apos;t have an account?{" "}
         <Link
           href="/signup"

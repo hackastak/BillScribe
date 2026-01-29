@@ -13,11 +13,11 @@ interface InvoiceStatusSelectProps {
 }
 
 const statusStyles: Record<InvoiceStatus, string> = {
-  draft: "bg-neutral-100 text-neutral-700 border-neutral-200",
-  sent: "bg-blue-100 text-blue-700 border-blue-200",
-  paid: "bg-green-100 text-green-700 border-green-200",
-  overdue: "bg-red-100 text-red-700 border-red-200",
-  cancelled: "bg-neutral-100 text-neutral-500 border-neutral-200",
+  draft: "bg-[var(--color-status-neutral-bg)] text-[var(--color-status-neutral-fg)] border-[var(--color-status-neutral-border)]",
+  sent: "bg-[var(--color-status-info-bg)] text-[var(--color-status-info-fg)] border-[var(--color-status-info-border)]",
+  paid: "bg-[var(--color-status-success-bg)] text-[var(--color-status-success-fg)] border-[var(--color-status-success-border)]",
+  overdue: "bg-[var(--color-status-error-bg)] text-[var(--color-status-error-fg)] border-[var(--color-status-error-border)]",
+  cancelled: "bg-[var(--color-status-neutral-bg)] text-[var(--color-status-neutral-fg)] border-[var(--color-status-neutral-border)]",
 };
 
 export function InvoiceStatusSelect({
@@ -52,25 +52,15 @@ export function InvoiceStatusSelect({
           isPending && "opacity-70 cursor-wait"
         )}
       >
-        <option value="draft" className="bg-white text-neutral-900">
-          Draft
-        </option>
-        <option value="sent" className="bg-white text-neutral-900">
-          Sent
-        </option>
-        <option value="paid" className="bg-white text-neutral-900">
-          Paid
-        </option>
-        <option value="overdue" className="bg-white text-neutral-900">
-          Overdue
-        </option>
-        <option value="cancelled" className="bg-white text-neutral-900">
-          Cancelled
-        </option>
+        <option value="draft">Draft</option>
+        <option value="sent">Sent</option>
+        <option value="paid">Paid</option>
+        <option value="overdue">Overdue</option>
+        <option value="cancelled">Cancelled</option>
       </select>
-      <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center px-2 text-current opacity-50">
+      <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center px-2">
         <svg
-          className="h-3 w-3"
+          className="h-3 w-3 text-current"
           fill="none"
           stroke="currentColor"
           viewBox="0 0 24 24"
@@ -78,7 +68,7 @@ export function InvoiceStatusSelect({
           <path
             strokeLinecap="round"
             strokeLinejoin="round"
-            strokeWidth={2}
+            strokeWidth={2.5}
             d="M19 9l-7 7-7-7"
           />
         </svg>

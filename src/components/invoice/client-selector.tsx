@@ -81,13 +81,13 @@ export function ClientSelector({
       </div>
 
       {showNewClientForm && (
-        <div className="rounded-lg border border-neutral-200 bg-neutral-50 p-4">
-          <h4 className="mb-3 text-sm font-medium text-neutral-900">
+        <div className="rounded-lg border border-[var(--color-border-default)] bg-[var(--color-bg-muted)] p-4">
+          <h4 className="mb-3 text-sm font-medium text-[var(--color-fg-default)]">
             New Client
           </h4>
 
           {state.error && (
-            <div className="mb-3 rounded-lg bg-error-50 px-3 py-2 text-sm text-error-700 border border-error-200">
+            <div className="mb-3 rounded-lg bg-[var(--color-status-error-bg)] px-3 py-2 text-sm text-[var(--color-status-error-fg)] border border-[var(--color-status-error-border)]">
               {state.error}
             </div>
           )}

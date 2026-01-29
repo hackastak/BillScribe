@@ -27,7 +27,7 @@ export function SignupForm() {
         <div className="rounded-lg bg-success-50 px-4 py-3 text-sm text-success-700 border border-success-200">
           {state.message}
         </div>
-        <p className="text-center text-sm text-neutral-600">
+        <p className="text-center text-sm text-[var(--color-fg-muted)]">
           Already have an account?{" "}
           <Link
             href="/login"
@@ -88,7 +88,7 @@ export function SignupForm() {
             {state.fieldErrors.password[0]}
           </p>
         )}
-        <p className="text-xs text-neutral-500">
+        <p className="text-xs text-[var(--color-fg-subtle)]">
           Must be at least 8 characters with uppercase, lowercase, and a number.
         </p>
       </div>
@@ -118,7 +118,7 @@ export function SignupForm() {
 
       <SubmitButton />
 
-      <p className="text-center text-sm text-neutral-600">
+      <p className="text-center text-sm text-[var(--color-fg-muted)]">
         Already have an account?{" "}
         <Link
           href="/login"

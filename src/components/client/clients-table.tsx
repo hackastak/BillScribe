@@ -110,7 +110,7 @@ export function ClientsTable({ clients, metadata }: ClientsTableProps) {
             className="max-w-sm"
           />
           <select
-            className="h-10 rounded-lg border border-neutral-300 bg-white px-3 py-2 text-sm focus:border-transparent focus:outline-none focus:ring-2 focus:ring-primary-500"
+            className="h-10 rounded-lg border border-[var(--color-input-border)] bg-[var(--color-input-bg)] px-3 py-2 text-sm text-[var(--color-fg-default)] focus:border-transparent focus:outline-none focus:ring-2 focus:ring-primary-500"
             value={searchParams.get("status") || "all"}
             onChange={handleStatusFilterChange}
           >
@@ -121,7 +121,7 @@ export function ClientsTable({ clients, metadata }: ClientsTableProps) {
         </div>
 
         <select
-          className="h-10 rounded-lg border border-neutral-300 bg-white px-3 py-2 text-sm focus:border-transparent focus:outline-none focus:ring-2 focus:ring-primary-500"
+          className="h-10 rounded-lg border border-[var(--color-input-border)] bg-[var(--color-input-bg)] px-3 py-2 text-sm text-[var(--color-fg-default)] focus:border-transparent focus:outline-none focus:ring-2 focus:ring-primary-500"
           value={currentSort}
           onChange={(e) => handleSortChange(e.target.value)}
         >
@@ -132,10 +132,10 @@ export function ClientsTable({ clients, metadata }: ClientsTableProps) {
         </select>
       </div>
 
-      <div className="overflow-hidden rounded-lg border border-neutral-200 bg-white shadow-sm">
+      <div className="overflow-hidden rounded-lg border border-[var(--color-border-default)] bg-[var(--color-bg-surface)] shadow-sm">
         <div className="overflow-x-auto">
           <table className="w-full">
-            <thead className="bg-neutral-50 text-left text-xs font-medium uppercase tracking-wider text-neutral-500">
+            <thead className="bg-[var(--color-bg-muted)] text-left text-xs font-medium uppercase tracking-wider text-[var(--color-fg-subtle)]">
               <tr>
                 <th className="px-6 py-3">Name</th>
                 <th className="px-6 py-3">Company</th>
@@ -144,12 +144,12 @@ export function ClientsTable({ clients, metadata }: ClientsTableProps) {
                 <th className="px-6 py-3 text-right">Actions</th>
               </tr>
             </thead>
-            <tbody className="divide-y divide-neutral-200">
+            <tbody className="divide-y divide-[var(--color-border-default)]">
               {clients.length === 0 ? (
                 <tr>
                   <td
                     colSpan={5}
-                    className="px-6 py-8 text-center text-neutral-500"
+                    className="px-6 py-8 text-center text-[var(--color-fg-subtle)]"
                   >
                     No clients found.{" "}
                     <Link
@@ -162,25 +162,25 @@ export function ClientsTable({ clients, metadata }: ClientsTableProps) {
                 </tr>
               ) : (
                 clients.map((client) => (
-                  <tr key={client.id} className="hover:bg-neutral-50">
-                    <td className="px-6 py-4 font-medium text-neutral-900">
+                  <tr key={client.id} className="hover:bg-[var(--color-bg-hover)]">
+                    <td className="px-6 py-4 font-medium text-[var(--color-fg-default)]">
                       {client.name}
                     </td>
-                    <td className="px-6 py-4 text-neutral-600">
+                    <td className="px-6 py-4 text-[var(--color-fg-muted)]">
                       {client.company || "-"}
                     </td>
                     <td className="px-6 py-4">
                       <span
-                        className={`inline-flex rounded-full px-2 py-1 text-xs font-medium ${
+                        className={`inline-flex rounded-full px-2 py-1 text-xs font-medium border ${
                           client.status === "active"
-                            ? "bg-green-100 text-green-800"
-                            : "bg-neutral-100 text-neutral-600"
+                            ? "bg-[var(--color-status-success-bg)] text-[var(--color-status-success-fg)] border-[var(--color-status-success-border)]"
+                            : "bg-[var(--color-status-neutral-bg)] text-[var(--color-status-neutral-fg)] border-[var(--color-status-neutral-border)]"
                         }`}
                       >
                         {client.status === "active" ? "Active" : "Inactive"}
                       </span>
                     </td>
-                    <td className="px-6 py-4 text-neutral-600">
+                    <td className="px-6 py-4 text-[var(--color-fg-muted)]">
                       {formatDate(client.createdAt)}
                     </td>
                     <td className="px-6 py-4 text-right">
@@ -210,7 +210,7 @@ export function ClientsTable({ clients, metadata }: ClientsTableProps) {
       {/* Pagination */}
       {metadata.totalPages > 1 && (
         <div className="flex items-center justify-between">
-          <p className="text-sm text-neutral-600">
+          <p className="text-sm text-[var(--color-fg-muted)]">
             Page {metadata.page} of {metadata.totalPages}
           </p>
           <div className="flex gap-2">

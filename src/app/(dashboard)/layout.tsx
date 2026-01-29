@@ -3,6 +3,7 @@ import Link from "next/link";
 import { createClient } from "@/lib/supabase/server";
 import { logout } from "@/actions/auth";
 import { Button } from "@/components/ui/button";
+import { ThemeToggle } from "@/components/ui/theme-toggle";
 
 export default async function DashboardLayout({
   children,
@@ -19,41 +20,42 @@ export default async function DashboardLayout({
   }
 
   return (
-    <div className="min-h-screen bg-neutral-50">
-      <header className="sticky top-0 z-50 border-b border-neutral-200 bg-white">
+    <div className="min-h-screen bg-[var(--color-bg-base)]">
+      <header className="sticky top-0 z-50 border-b border-[var(--color-border-default)] bg-[var(--color-bg-surface)]">
         <div className="mx-auto flex h-16 max-w-7xl items-center justify-between px-4 sm:px-6 lg:px-8">
           <div className="flex items-center gap-8">
-            <Link href="/dashboard" className="text-xl font-bold text-neutral-900">
+            <Link href="/dashboard" className="text-xl font-bold text-[var(--color-fg-default)]">
               BillScribe
             </Link>
             <nav className="hidden items-center gap-6 md:flex">
               <Link
                 href="/dashboard"
-                className="text-sm font-medium text-neutral-600 hover:text-neutral-900"
+                className="text-sm font-medium text-[var(--color-fg-muted)] hover:text-[var(--color-fg-default)]"
               >
                 Dashboard
               </Link>
               <Link
                 href="/invoices"
-                className="text-sm font-medium text-neutral-600 hover:text-neutral-900"
+                className="text-sm font-medium text-[var(--color-fg-muted)] hover:text-[var(--color-fg-default)]"
               >
                 Invoices
               </Link>
               <Link
                 href="/clients"
-                className="text-sm font-medium text-neutral-600 hover:text-neutral-900"
+                className="text-sm font-medium text-[var(--color-fg-muted)] hover:text-[var(--color-fg-default)]"
               >
                 Clients
               </Link>
             </nav>
           </div>
           <div className="flex items-center gap-4">
-            <span className="hidden text-sm text-neutral-600 sm:block">
+            <span className="hidden text-sm text-[var(--color-fg-muted)] sm:block">
               {user.email}
             </span>
+            <ThemeToggle />
             <Link
               href="/settings"
-              className="text-neutral-600 hover:text-neutral-900"
+              className="text-[var(--color-fg-muted)] hover:text-[var(--color-fg-default)]"
               aria-label="Settings"
             >
               <svg

@@ -40,8 +40,10 @@ export default async function EditInvoicePage({
   return (
     <div className="space-y-6">
       <div>
-        <h1 className="text-2xl font-bold text-neutral-900">Edit Invoice</h1>
-        <p className="mt-1 text-sm text-neutral-600">
+        <h1 className="text-2xl font-bold text-[var(--color-fg-default)]">
+          Edit Invoice
+        </h1>
+        <p className="mt-1 text-sm text-[var(--color-fg-muted)]">
           Update the invoice details below
         </p>
       </div>

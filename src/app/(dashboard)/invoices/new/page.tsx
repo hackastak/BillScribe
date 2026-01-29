@@ -24,10 +24,10 @@ export default async function NewInvoicePage() {
   return (
     <div className="space-y-6">
       <div>
-        <h1 className="text-2xl font-bold text-neutral-900">
+        <h1 className="text-2xl font-bold text-[var(--color-fg-default)]">
           Create New Invoice
         </h1>
-        <p className="mt-1 text-sm text-neutral-600">
+        <p className="mt-1 text-sm text-[var(--color-fg-muted)]">
           Fill in the details below to create a new invoice
         </p>
       </div>

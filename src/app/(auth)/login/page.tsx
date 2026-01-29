@@ -21,16 +21,16 @@ export default async function LoginPage({ searchParams }: LoginPageProps) {
   return (
     <div className="space-y-6">
       <div className="space-y-2 text-center">
-        <h2 className="text-2xl font-semibold tracking-tight text-neutral-900">
+        <h2 className="text-2xl font-semibold tracking-tight text-[var(--color-fg-default)]">
           Welcome back
         </h2>
-        <p className="text-sm text-neutral-600">
+        <p className="text-sm text-[var(--color-fg-muted)]">
           Sign in to your account to continue
         </p>
       </div>
 
       {error === "auth_callback_error" && (
-        <div className="rounded-lg bg-error-50 px-4 py-3 text-sm text-error-700 border border-error-200">
+        <div className="rounded-lg bg-[var(--color-status-error-bg)] px-4 py-3 text-sm text-[var(--color-status-error-fg)] border border-[var(--color-status-error-border)]">
           There was an error confirming your account. Please try again.
         </div>
       )}

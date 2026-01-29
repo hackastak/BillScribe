@@ -30,7 +30,7 @@ export function ResetPasswordForm() {
         <div className="rounded-lg bg-success-50 px-4 py-3 text-sm text-success-700 border border-success-200">
           {state.message}
         </div>
-        <p className="text-center text-sm text-neutral-600">
+        <p className="text-center text-sm text-[var(--color-fg-muted)]">
           <Link
             href="/login"
             className="font-medium text-primary-600 hover:text-primary-700"
@@ -69,7 +69,7 @@ export function ResetPasswordForm() {
             {state.fieldErrors.password[0]}
           </p>
         )}
-        <p className="text-xs text-neutral-500">
+        <p className="text-xs text-[var(--color-fg-subtle)]">
           Must be at least 8 characters with uppercase, lowercase, and a number.
         </p>
       </div>

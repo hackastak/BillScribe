@@ -35,10 +35,10 @@ export function ProfileSettings({ profile }: ProfileSettingsProps) {
 
   return (
     <Card>
-      <h3 className="text-lg font-semibold text-neutral-900 mb-4">
+      <h3 className="text-lg font-semibold text-[var(--color-fg-default)] mb-4">
         Company Information
       </h3>
-      <p className="text-sm text-neutral-600 mb-4">
+      <p className="text-sm text-[var(--color-fg-muted)] mb-4">
         This information will appear on your invoices.
       </p>
 
@@ -97,7 +97,7 @@ export function ProfileSettings({ profile }: ProfileSettingsProps) {
             placeholder="123 Main St&#10;Suite 100&#10;New York, NY 10001"
             rows={3}
           />
-          <p className="text-xs text-neutral-500">
+          <p className="text-xs text-[var(--color-fg-subtle)]">
             This address will appear on your invoices
           </p>
         </div>

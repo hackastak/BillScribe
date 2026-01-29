@@ -9,7 +9,7 @@ export const Card = forwardRef<HTMLDivElement, CardProps>(
       <div
         ref={ref}
         className={cn(
-          "rounded-2xl bg-white p-6 shadow-card",
+          "rounded-2xl bg-[var(--color-bg-surface)] p-6 shadow-card",
           className
         )}
         {...props}
@@ -37,7 +37,7 @@ export const CardTitle = forwardRef<HTMLHeadingElement, HTMLAttributes<HTMLHeadi
     return (
       <h3
         ref={ref}
-        className={cn("text-lg font-semibold text-neutral-900", className)}
+        className={cn("text-lg font-semibold text-[var(--color-fg-default)]", className)}
         {...props}
       />
     );

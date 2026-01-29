@@ -9,11 +9,14 @@ export default async function Home() {
   } = await supabase.auth.getUser();
 
   return (
-    <main className="min-h-screen">
+    <main className="min-h-screen bg-[var(--color-bg-base)]">
       {/* NavBar */}
-      <header className="sticky top-0 z-50 border-b border-neutral-200 bg-white">
+      <header className="sticky top-0 z-50 border-b border-[var(--color-border-default)] bg-[var(--color-bg-surface)]">
         <div className="mx-auto flex h-16 max-w-7xl items-center justify-between px-4 sm:px-6 lg:px-8">
-          <Link href="/" className="text-xl font-bold text-neutral-900">
+          <Link
+            href="/"
+            className="text-xl font-bold text-[var(--color-fg-default)]"
+          >
             BillScribe
           </Link>
           {user && (
@@ -27,10 +30,10 @@ export default async function Home() {
       {/* Hero Section */}
       <section className="flex flex-col items-center justify-center px-6 py-24 sm:py-32">
         <div className="mx-auto max-w-2xl text-center">
-          <h1 className="text-4xl font-bold tracking-tight text-neutral-900 sm:text-6xl">
+          <h1 className="text-4xl font-bold tracking-tight text-[var(--color-fg-default)] sm:text-6xl">
             Invoice Management Made Simple
           </h1>
-          <p className="mt-6 text-lg leading-8 text-neutral-600">
+          <p className="mt-6 text-lg leading-8 text-[var(--color-fg-muted)]">
             BillScribe helps you create professional invoices, track payments,
             and manage your clients—all in one place. Spend less time on
             paperwork and more time growing your business.
@@ -49,19 +52,19 @@ export default async function Home() {
       </section>
 
       {/* Features Section */}
-      <section className="bg-neutral-50 px-6 py-24">
+      <section className="bg-[var(--color-bg-muted)] px-6 py-24">
         <div className="mx-auto max-w-5xl">
-          <h2 className="text-center text-3xl font-bold tracking-tight text-neutral-900 sm:text-4xl">
+          <h2 className="text-center text-3xl font-bold tracking-tight text-[var(--color-fg-default)] sm:text-4xl">
             Everything you need to manage invoices
           </h2>
-          <p className="mt-4 text-center text-lg text-neutral-600">
+          <p className="mt-4 text-center text-lg text-[var(--color-fg-muted)]">
             Simple tools to streamline your billing workflow
           </p>
 
           <div className="mt-16 grid gap-8 sm:grid-cols-2 lg:grid-cols-3">
             {/* Feature 1: Create Invoices */}
-            <div className="rounded-xl bg-white p-8 shadow-sm">
-              <div className="flex h-12 w-12 items-center justify-center rounded-lg bg-primary-100 text-primary-600">
+            <div className="rounded-xl bg-[var(--color-bg-surface)] p-8 shadow-sm">
+              <div className="flex h-12 w-12 items-center justify-center rounded-lg bg-[var(--color-status-info-bg)] text-[var(--color-status-info-fg)]">
                 <svg
                   className="h-6 w-6"
                   fill="none"
@@ -76,18 +79,18 @@ export default async function Home() {
                   />
                 </svg>
               </div>
-              <h3 className="mt-6 text-lg font-semibold text-neutral-900">
+              <h3 className="mt-6 text-lg font-semibold text-[var(--color-fg-default)]">
                 Create Invoices
               </h3>
-              <p className="mt-2 text-neutral-600">
+              <p className="mt-2 text-[var(--color-fg-muted)]">
                 Generate professional invoices in seconds. Customize templates,
                 add line items, and send directly to your clients.
               </p>
             </div>
 
             {/* Feature 2: Track Payments */}
-            <div className="rounded-xl bg-white p-8 shadow-sm">
-              <div className="flex h-12 w-12 items-center justify-center rounded-lg bg-primary-100 text-primary-600">
+            <div className="rounded-xl bg-[var(--color-bg-surface)] p-8 shadow-sm">
+              <div className="flex h-12 w-12 items-center justify-center rounded-lg bg-[var(--color-status-info-bg)] text-[var(--color-status-info-fg)]">
                 <svg
                   className="h-6 w-6"
                   fill="none"
@@ -102,18 +105,18 @@ export default async function Home() {
                   />
                 </svg>
               </div>
-              <h3 className="mt-6 text-lg font-semibold text-neutral-900">
+              <h3 className="mt-6 text-lg font-semibold text-[var(--color-fg-default)]">
                 Track Payments
               </h3>
-              <p className="mt-2 text-neutral-600">
+              <p className="mt-2 text-[var(--color-fg-muted)]">
                 Monitor payment status in real-time. Get notified when invoices
                 are viewed, paid, or overdue.
               </p>
             </div>
 
             {/* Feature 3: Manage Clients */}
-            <div className="rounded-xl bg-white p-8 shadow-sm">
-              <div className="flex h-12 w-12 items-center justify-center rounded-lg bg-primary-100 text-primary-600">
+            <div className="rounded-xl bg-[var(--color-bg-surface)] p-8 shadow-sm">
+              <div className="flex h-12 w-12 items-center justify-center rounded-lg bg-[var(--color-status-info-bg)] text-[var(--color-status-info-fg)]">
                 <svg
                   className="h-6 w-6"
                   fill="none"
@@ -128,10 +131,10 @@ export default async function Home() {
                   />
                 </svg>
               </div>
-              <h3 className="mt-6 text-lg font-semibold text-neutral-900">
+              <h3 className="mt-6 text-lg font-semibold text-[var(--color-fg-default)]">
                 Manage Clients
               </h3>
-              <p className="mt-2 text-neutral-600">
+              <p className="mt-2 text-[var(--color-fg-muted)]">
                 Keep all your client information organized. Store contact
                 details, view invoice history, and build stronger relationships.
               </p>
@@ -143,10 +146,10 @@ export default async function Home() {
       {/* CTA Section */}
       <section className="px-6 py-24">
         <div className="mx-auto max-w-2xl text-center">
-          <h2 className="text-3xl font-bold tracking-tight text-neutral-900 sm:text-4xl">
+          <h2 className="text-3xl font-bold tracking-tight text-[var(--color-fg-default)] sm:text-4xl">
             Ready to simplify your invoicing?
           </h2>
-          <p className="mt-4 text-lg text-neutral-600">
+          <p className="mt-4 text-lg text-[var(--color-fg-muted)]">
             Join thousands of businesses that trust BillScribe to manage their
             billing. Get started for free today.
           </p>

@@ -74,29 +74,29 @@ export function ClientDetailModal({
       <div className="p-6 space-y-6">
         <div>
           <div className="flex items-center gap-2">
-            <h2 className="text-xl font-semibold text-neutral-900">
+            <h2 className="text-xl font-semibold text-[var(--color-fg-default)]">
               {client.name}
             </h2>
             <span
-              className={`inline-flex rounded-full px-2 py-1 text-xs font-medium ${
+              className={`inline-flex rounded-full px-2 py-1 text-xs font-medium border ${
                 client.status === "active"
-                  ? "bg-green-100 text-green-800"
-                  : "bg-neutral-100 text-neutral-600"
+                  ? "bg-[var(--color-status-success-bg)] text-[var(--color-status-success-fg)] border-[var(--color-status-success-border)]"
+                  : "bg-[var(--color-status-neutral-bg)] text-[var(--color-status-neutral-fg)] border-[var(--color-status-neutral-border)]"
               }`}
             >
               {client.status === "active" ? "Active" : "Inactive"}
             </span>
           </div>
           {client.company && (
-            <p className="mt-1 text-neutral-600">{client.company}</p>
+            <p className="mt-1 text-[var(--color-fg-muted)]">{client.company}</p>
           )}
         </div>
 
         <div className="space-y-4">
           <div className="grid grid-cols-2 gap-4">
             <div>
-              <p className="text-sm font-medium text-neutral-500">Email</p>
-              <p className="mt-1 text-neutral-900">
+              <p className="text-sm font-medium text-[var(--color-fg-subtle)]">Email</p>
+              <p className="mt-1 text-[var(--color-fg-default)]">
                 {client.email ? (
                   <a
                     href={`mailto:${client.email}`}
@@ -110,8 +110,8 @@ export function ClientDetailModal({
               </p>
             </div>
             <div>
-              <p className="text-sm font-medium text-neutral-500">Phone</p>
-              <p className="mt-1 text-neutral-900">
+              <p className="text-sm font-medium text-[var(--color-fg-subtle)]">Phone</p>
+              <p className="mt-1 text-[var(--color-fg-default)]">
                 {client.phone ? (
                   <a
                     href={`tel:${client.phone}`}
@@ -128,8 +128,8 @@ export function ClientDetailModal({
 
           {client.address && (
             <div>
-              <p className="text-sm font-medium text-neutral-500">Address</p>
-              <p className="mt-1 whitespace-pre-line text-neutral-900">
+              <p className="text-sm font-medium text-[var(--color-fg-subtle)]">Address</p>
+              <p className="mt-1 whitespace-pre-line text-[var(--color-fg-default)]">
                 {client.address}
               </p>
             </div>
@@ -137,73 +137,73 @@ export function ClientDetailModal({
 
           {client.notes && (
             <div>
-              <p className="text-sm font-medium text-neutral-500">Notes</p>
-              <p className="mt-1 whitespace-pre-line text-neutral-900">
+              <p className="text-sm font-medium text-[var(--color-fg-subtle)]">Notes</p>
+              <p className="mt-1 whitespace-pre-line text-[var(--color-fg-default)]">
                 {client.notes}
               </p>
             </div>
           )}
 
           {/* Invoice Statistics */}
-          <div className="border-t border-neutral-200 pt-4">
-            <h3 className="text-sm font-semibold text-neutral-900 mb-3">
+          <div className="border-t border-[var(--color-border-default)] pt-4">
+            <h3 className="text-sm font-semibold text-[var(--color-fg-default)] mb-3">
               Invoice Statistics
             </h3>
             {isLoadingStats ? (
-              <div className="text-sm text-neutral-500">Loading stats...</div>
+              <div className="text-sm text-[var(--color-fg-subtle)]">Loading stats...</div>
             ) : invoiceStats ? (
               <div className="grid grid-cols-2 gap-4">
-                <div className="rounded-lg bg-neutral-50 p-3">
-                  <p className="text-xs font-medium text-neutral-500">
+                <div className="rounded-lg bg-[var(--color-bg-muted)] p-3 border border-[var(--color-border-default)]">
+                  <p className="text-xs font-medium text-[var(--color-fg-subtle)]">
                     Total Invoices
                   </p>
-                  <p className="mt-1 text-2xl font-semibold text-neutral-900">
+                  <p className="mt-1 text-2xl font-semibold text-[var(--color-fg-default)]">
                     {invoiceStats.totalInvoices}
                   </p>
                 </div>
-                <div className="rounded-lg bg-green-50 p-3">
-                  <p className="text-xs font-medium text-green-700">
+                <div className="rounded-lg bg-[var(--color-status-success-bg)] p-3 border border-[var(--color-status-success-border)]">
+                  <p className="text-xs font-medium text-[var(--color-status-success-fg)]">
                     Amount Paid
                   </p>
-                  <p className="mt-1 text-2xl font-semibold text-green-900">
+                  <p className="mt-1 text-2xl font-semibold text-[var(--color-status-success-fg)]">
                     {formatCurrency(invoiceStats.paidAmount)}
                   </p>
                 </div>
-                <div className="rounded-lg bg-yellow-50 p-3">
-                  <p className="text-xs font-medium text-yellow-700">
+                <div className="rounded-lg bg-[var(--color-status-warning-bg)] p-3 border border-[var(--color-status-warning-border)]">
+                  <p className="text-xs font-medium text-[var(--color-status-warning-fg)]">
                     Pending Amount
                   </p>
-                  <p className="mt-1 text-2xl font-semibold text-yellow-900">
+                  <p className="mt-1 text-2xl font-semibold text-[var(--color-status-warning-fg)]">
                     {formatCurrency(invoiceStats.pendingAmount)}
                   </p>
                 </div>
-                <div className="rounded-lg bg-red-50 p-3">
-                  <p className="text-xs font-medium text-red-700">
+                <div className="rounded-lg bg-[var(--color-status-error-bg)] p-3 border border-[var(--color-status-error-border)]">
+                  <p className="text-xs font-medium text-[var(--color-status-error-fg)]">
                     Overdue Amount
                   </p>
-                  <p className="mt-1 text-2xl font-semibold text-red-900">
+                  <p className="mt-1 text-2xl font-semibold text-[var(--color-status-error-fg)]">
                     {formatCurrency(invoiceStats.overdueAmount)}
                   </p>
                 </div>
               </div>
             ) : (
-              <div className="text-sm text-neutral-500">
+              <div className="text-sm text-[var(--color-fg-subtle)]">
                 No invoice data available
               </div>
             )}
           </div>
 
-          <div className="border-t border-neutral-200 pt-4">
+          <div className="border-t border-[var(--color-border-default)] pt-4">
             <div className="grid grid-cols-2 gap-4 text-sm">
               <div>
-                <p className="font-medium text-neutral-500">Created</p>
-                <p className="mt-1 text-neutral-700">
+                <p className="font-medium text-[var(--color-fg-subtle)]">Created</p>
+                <p className="mt-1 text-[var(--color-fg-muted)]">
                   {formatDate(client.createdAt)}
                 </p>
               </div>
               <div>
-                <p className="font-medium text-neutral-500">Last Updated</p>
-                <p className="mt-1 text-neutral-700">
+                <p className="font-medium text-[var(--color-fg-subtle)]">Last Updated</p>
+                <p className="mt-1 text-[var(--color-fg-muted)]">
                   {formatDate(client.updatedAt)}
                 </p>
               </div>
@@ -211,7 +211,7 @@ export function ClientDetailModal({
           </div>
         </div>
 
-        <div className="flex justify-between gap-3 border-t border-neutral-200 pt-4">
+        <div className="flex justify-between gap-3 border-t border-[var(--color-border-default)] pt-4">
           <Button
             variant="destructive"
             onClick={handleToggleStatus}

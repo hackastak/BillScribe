@@ -99,12 +99,12 @@ export function InvoicePreviewContent({
   return (
     <div className="p-6">
       {state.error && (
-        <div className="mb-4 rounded-lg bg-error-50 px-4 py-3 text-sm text-error-700 border border-error-200">
+        <div className="mb-4 rounded-lg bg-[var(--color-status-error-bg)] px-4 py-3 text-sm text-[var(--color-status-error-fg)] border border-[var(--color-status-error-border)]">
           {state.error}
         </div>
       )}
 
-      <div className="space-y-8 mt-8">
+      <div className="space-y-8 mt-8 bg-white p-8 rounded-lg shadow-sm border border-neutral-200 text-neutral-900">
         {/* Header */}
         <div className="flex justify-between items-start">
           <div>
@@ -275,7 +275,7 @@ export function InvoicePreviewContent({
         )}
       </div>
 
-      <div className="mt-6 flex justify-between border-t border-neutral-200 pt-6">
+      <div className="mt-6 flex justify-between pt-6">
         <Button type="button" variant="secondary" onClick={onClose}>
           Continue Editing
         </Button>

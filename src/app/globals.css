@@ -74,7 +74,142 @@
     0 4px 12px -4px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.06);
 }
 
+/* ============================================
+   Semantic Color Tokens (Light Mode - Default)
+   ============================================ */
+:root {
+  /* Backgrounds */
+  --color-bg-base: var(--color-neutral-50);
+  --color-bg-surface: #ffffff;
+  --color-bg-elevated: #ffffff;
+  --color-bg-muted: var(--color-neutral-100);
+
+  /* Foreground/Text */
+  --color-fg-default: var(--color-neutral-900);
+  --color-fg-muted: var(--color-neutral-600);
+  --color-fg-subtle: var(--color-neutral-400);
+
+  /* Borders */
+  --color-border-default: var(--color-neutral-200);
+  --color-border-muted: var(--color-neutral-300);
+
+  /* Interactive States */
+  --color-bg-hover: var(--color-neutral-100);
+  --color-bg-active: var(--color-neutral-200);
+
+  /* Component-specific */
+  --color-input-bg: #ffffff;
+  --color-input-border: var(--color-neutral-300);
+
+  /* Status colors - Light mode */
+  --color-status-success-bg: #f0fdf4;
+  --color-status-success-fg: #15803d;
+  --color-status-success-border: #bbf7d0;
+
+  --color-status-warning-bg: #fffbeb;
+  --color-status-warning-fg: #b45309;
+  --color-status-warning-border: #fde68a;
+
+  --color-status-error-bg: #fef2f2;
+  --color-status-error-fg: #b91c1c;
+  --color-status-error-border: #fecaca;
+
+  --color-status-info-bg: #eff6ff;
+  --color-status-info-fg: #1e40af;
+  --color-status-info-border: #bfdbfe;
+
+  --color-status-neutral-bg: var(--color-neutral-100);
+  --color-status-neutral-fg: var(--color-neutral-700);
+  --color-status-neutral-border: var(--color-neutral-200);
+
+  /* Button colors - Light mode */
+  --color-button-destructive-bg: #dc2626;
+  --color-button-destructive-fg: #ffffff;
+  --color-button-destructive-hover: #b91c1c;
+  --color-button-destructive-active: #991b1b;
+  --color-button-destructive-ring: #ef4444;
+}
+
+/* ============================================
+   Dark Mode Semantic Tokens
+   ============================================ */
+.dark {
+  /* Backgrounds */
+  --color-bg-base: var(--color-neutral-950);
+  --color-bg-surface: var(--color-neutral-900);
+  --color-bg-elevated: var(--color-neutral-800);
+  --color-bg-muted: var(--color-neutral-800);
+
+  /* Foreground/Text */
+  --color-fg-default: var(--color-neutral-50);
+  --color-fg-muted: var(--color-neutral-400);
+  --color-fg-subtle: var(--color-neutral-500);
+
+  /* Borders */
+  --color-border-default: var(--color-neutral-700);
+  --color-border-muted: var(--color-neutral-600);
+
+  /* Interactive States */
+  --color-bg-hover: var(--color-neutral-800);
+  --color-bg-active: var(--color-neutral-700);
+
+  /* Component-specific */
+  --color-input-bg: var(--color-neutral-800);
+  --color-input-border: var(--color-neutral-600);
+
+  /* Status colors - Dark mode */
+  --color-status-success-bg: #14532d;
+  --color-status-success-fg: #86efac;
+  --color-status-success-border: #166534;
+
+  --color-status-warning-bg: #78350f;
+  --color-status-warning-fg: #fcd34d;
+  --color-status-warning-border: #92400e;
+
+  --color-status-error-bg: #7f1d1d;
+  --color-status-error-fg: #fca5a5;
+  --color-status-error-border: #991b1b;
+
+  --color-status-info-bg: #1e3a8a;
+  --color-status-info-fg: #93c5fd;
+  --color-status-info-border: #1e40af;
+
+  --color-status-neutral-bg: var(--color-neutral-800);
+  --color-status-neutral-fg: var(--color-neutral-300);
+  --color-status-neutral-border: var(--color-neutral-700);
+
+  /* Button colors - Dark mode */
+  --color-button-destructive-bg: #dc2626;
+  --color-button-destructive-fg: #ffffff;
+  --color-button-destructive-hover: #ef4444;
+  --color-button-destructive-active: #f87171;
+  --color-button-destructive-ring: #f87171;
+}
+
+/* ============================================
+   Theme Transition
+   ============================================ */
+html.theme-transition,
+html.theme-transition *,
+html.theme-transition *::before,
+html.theme-transition *::after {
+  transition:
+    background-color 0.2s ease,
+    border-color 0.2s ease,
+    color 0.15s ease !important;
+  transition-delay: 0s !important;
+}
+
 /* Base styles */
+@layer base {
+  button:not(:disabled),
+  [role="button"]:not(:disabled) {
+    cursor: pointer;
+  }
+}
+
 body {
-  @apply bg-neutral-50 text-neutral-900 antialiased;
+  @apply antialiased;
+  background-color: var(--color-bg-base);
+  color: var(--color-fg-default);
 }

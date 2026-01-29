@@ -18,19 +18,19 @@ export default async function NewClientPage() {
       <div>
         <Link
           href="/clients"
-          className="text-sm text-neutral-600 hover:text-neutral-900"
+          className="text-sm text-[var(--color-fg-muted)] hover:text-[var(--color-fg-default)]"
         >
           &larr; Back to Clients
         </Link>
-        <h1 className="mt-2 text-2xl font-bold text-neutral-900">
+        <h1 className="mt-2 text-2xl font-bold text-[var(--color-fg-default)]">
           Add New Client
         </h1>
-        <p className="mt-1 text-neutral-600">
+        <p className="mt-1 text-[var(--color-fg-muted)]">
           Create a new client to use in your invoices.
         </p>
       </div>
 
-      <div className="rounded-lg border border-neutral-200 bg-white p-6 shadow-sm">
+      <div className="rounded-lg border border-[var(--color-border-default)] bg-[var(--color-bg-surface)] p-6 shadow-sm">
         <ClientForm />
       </div>
     </div>

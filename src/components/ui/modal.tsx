@@ -48,13 +48,13 @@ export function Modal({ isOpen, onClose, children, className }: ModalProps) {
     >
       <div
         className={cn(
-          "relative my-8 w-full max-w-4xl rounded-2xl bg-white shadow-xl",
+          "relative my-8 w-full max-w-4xl rounded-2xl bg-[var(--color-bg-elevated)] shadow-xl",
           className
         )}
       >
         <button
           onClick={onClose}
-          className="absolute right-4 top-4 z-10 rounded-lg p-2 text-neutral-400 hover:bg-neutral-100 hover:text-neutral-600"
+          className="absolute right-4 top-4 z-10 rounded-lg p-2 text-[var(--color-fg-subtle)] hover:bg-[var(--color-bg-hover)] hover:text-[var(--color-fg-muted)]"
           aria-label="Close modal"
         >
           <svg

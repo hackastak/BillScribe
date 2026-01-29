@@ -61,7 +61,9 @@ export function LineItems({
   return (
     <div className="space-y-3">
       <div className="flex items-center justify-between">
-        <h3 className="text-sm font-medium text-neutral-900">Line Items</h3>
+        <h3 className="text-sm font-medium text-[var(--color-fg-default)]">
+          Line Items
+        </h3>
         <Button
           type="button"
           variant="secondary"
@@ -74,31 +76,33 @@ export function LineItems({
       </div>
 
       {errors?.items && (
-        <p className="text-sm text-error-600">{errors.items[0]}</p>
+        <p className="text-sm text-[var(--color-status-error-fg)]">
+          {errors.items[0]}
+        </p>
       )}
 
-      <div className="overflow-hidden rounded-lg border border-neutral-200">
+      <div className="overflow-hidden rounded-lg border border-[var(--color-border-default)]">
         <table className="w-full">
-          <thead className="bg-neutral-50">
+          <thead className="bg-[var(--color-bg-muted)]">
             <tr>
-              <th className="px-3 py-2 text-left text-xs font-medium text-neutral-600">
+              <th className="px-3 py-2 text-left text-xs font-medium text-[var(--color-fg-muted)]">
                 Description
               </th>
-              <th className="w-24 px-3 py-2 text-left text-xs font-medium text-neutral-600">
+              <th className="w-24 px-3 py-2 text-left text-xs font-medium text-[var(--color-fg-muted)]">
                 Qty
               </th>
-              <th className="w-28 px-3 py-2 text-left text-xs font-medium text-neutral-600">
+              <th className="w-28 px-3 py-2 text-left text-xs font-medium text-[var(--color-fg-muted)]">
                 Unit Price
               </th>
-              <th className="w-28 px-3 py-2 text-right text-xs font-medium text-neutral-600">
+              <th className="w-28 px-3 py-2 text-right text-xs font-medium text-[var(--color-fg-muted)]">
                 Amount
               </th>
               <th className="w-12 px-3 py-2"></th>
             </tr>
           </thead>
-          <tbody className="divide-y divide-neutral-200">
+          <tbody className="divide-y divide-[var(--color-border-default)]">
             {items.map((item, index) => (
-              <tr key={item.id} className="bg-white">
+              <tr key={item.id} className="bg-[var(--color-bg-surface)]">
                 <td className="px-3 py-2">
                   <Input
                     value={item.description}
@@ -141,7 +145,7 @@ export function LineItems({
                   />
                 </td>
                 <td className="px-3 py-2 text-right">
-                  <span className="text-sm font-medium text-neutral-900">
+                  <span className="text-sm font-medium text-[var(--color-fg-default)]">
                     ${item.amount}
                   </span>
                 </td>
@@ -150,7 +154,7 @@ export function LineItems({
                     type="button"
                     onClick={() => removeItem(item.id)}
                     disabled={items.length === 1 || disabled}
-                    className="text-neutral-400 hover:text-error-600 disabled:cursor-not-allowed disabled:opacity-50"
+                    className="text-[var(--color-fg-subtle)] hover:text-[var(--color-status-error-fg)] disabled:cursor-not-allowed disabled:opacity-50"
                     aria-label="Remove item"
                   >
                     <svg

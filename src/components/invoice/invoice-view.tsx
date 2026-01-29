@@ -90,7 +90,7 @@ export function InvoiceView({
           {showBackLink && (
             <Link
               href="/dashboard"
-              className="text-neutral-500 hover:text-neutral-700"
+              className="text-[var(--color-fg-muted)] hover:text-[var(--color-fg-default)]"
             >
               <svg
                 className="h-5 w-5"
@@ -107,7 +107,7 @@ export function InvoiceView({
               </svg>
             </Link>
           )}
-          <h1 className="text-2xl font-bold text-neutral-900">
+          <h1 className="text-2xl font-bold text-[var(--color-fg-default)]">
             {invoice.invoiceNumber}
           </h1>
           <InvoiceStatusSelect
@@ -135,7 +135,7 @@ export function InvoiceView({
         </div>
       </div>
 
-      <Card className="p-8" ref={invoiceRef}>
+      <Card className="p-8 !bg-white" ref={invoiceRef}>
         <div className="space-y-8">
           {/* Header */}
           <div className="flex justify-between items-start">

@@ -183,11 +183,11 @@ export function InvoiceForm({
     <>
       <div className="space-y-6">
         {isReadOnly && (
-          <div className="rounded-lg bg-yellow-50 border border-yellow-200 p-4">
+          <div className="rounded-lg bg-[var(--color-status-warning-bg)] border border-[var(--color-status-warning-border)] p-4">
             <div className="flex">
               <div className="flex-shrink-0">
                 <svg
-                  className="h-5 w-5 text-yellow-400"
+                  className="h-5 w-5 text-[var(--color-status-warning-fg)]"
                   viewBox="0 0 20 20"
                   fill="currentColor"
                 >
@@ -199,10 +199,10 @@ export function InvoiceForm({
                 </svg>
               </div>
               <div className="ml-3">
-                <h3 className="text-sm font-medium text-yellow-800">
+                <h3 className="text-sm font-medium text-[var(--color-status-warning-fg)]">
                   Editing Restricted
                 </h3>
-                <div className="mt-2 text-sm text-yellow-700">
+                <div className="mt-2 text-sm text-[var(--color-status-warning-fg)]">
                   <p>
                     This invoice cannot be edited because it is currently marked
                     as <strong>{invoice.status}</strong>. Only draft invoices
@@ -319,22 +319,22 @@ export function InvoiceForm({
                 />
               </div>
 
-              <div className="rounded-lg bg-neutral-50 p-4 space-y-2">
+              <div className="rounded-lg bg-[var(--color-bg-muted)] p-4 space-y-2 border border-[var(--color-border-default)]">
                 <div className="flex justify-between text-sm">
-                  <span className="text-neutral-600">Subtotal</span>
-                  <span className="font-medium">${calculations.subtotal}</span>
+                  <span className="text-[var(--color-fg-muted)]">Subtotal</span>
+                  <span className="font-medium text-[var(--color-fg-default)]">${calculations.subtotal}</span>
                 </div>
                 {parseFloat(taxRate) > 0 && (
                   <div className="flex justify-between text-sm">
-                    <span className="text-neutral-600">Tax ({taxRate}%)</span>
-                    <span className="font-medium">
+                    <span className="text-[var(--color-fg-muted)]">Tax ({taxRate}%)</span>
+                    <span className="font-medium text-[var(--color-fg-default)]">
                       ${calculations.taxAmount}
                     </span>
                   </div>
                 )}
-                <div className="border-t border-neutral-200 pt-2 flex justify-between">
-                  <span className="font-medium text-neutral-900">Total</span>
-                  <span className="text-lg font-semibold text-neutral-900">
+                <div className="border-t border-[var(--color-border-default)] pt-2 flex justify-between">
+                  <span className="font-medium text-[var(--color-fg-default)]">Total</span>
+                  <span className="text-lg font-semibold text-[var(--color-fg-default)]">
                     ${calculations.total}
                   </span>
                 </div>
@@ -391,9 +391,9 @@ export function InvoiceForm({
       >
         <div className="p-6">
           <div className="flex items-center gap-3 mb-4">
-            <div className="flex-shrink-0 w-10 h-10 rounded-full bg-red-100 flex items-center justify-center">
+            <div className="flex-shrink-0 w-10 h-10 rounded-full bg-[var(--color-status-error-bg)] flex items-center justify-center border border-[var(--color-status-error-border)]">
               <svg
-                className="h-5 w-5 text-red-600"
+                className="h-5 w-5 text-[var(--color-status-error-fg)]"
                 viewBox="0 0 20 20"
                 fill="currentColor"
               >
@@ -404,19 +404,19 @@ export function InvoiceForm({
                 />
               </svg>
             </div>
-            <h3 className="text-lg font-semibold text-neutral-900">
+            <h3 className="text-lg font-semibold text-[var(--color-fg-default)]">
               Delete Invoice
             </h3>
           </div>
 
-          <p className="text-neutral-600 mb-4">
+          <p className="text-[var(--color-fg-muted)] mb-4">
             Are you sure you want to delete invoice{" "}
             <strong>{invoice?.invoiceNumber}</strong>? This action cannot be
             undone.
           </p>
 
           {deleteError && (
-            <div className="mb-4 p-3 rounded-lg bg-red-50 border border-red-200 text-sm text-red-700">
+            <div className="mb-4 p-3 rounded-lg bg-[var(--color-status-error-bg)] border border-[var(--color-status-error-border)] text-sm text-[var(--color-status-error-fg)]">
               {deleteError}
             </div>
           )}

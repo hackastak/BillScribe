@@ -13,15 +13,15 @@ export const Button = forwardRef<HTMLButtonElement, ButtonProps>(
         ref={ref}
         className={cn(
           "inline-flex items-center cursor-pointer justify-center font-medium transition-colors",
-          "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-500 focus-visible:ring-offset-2",
+          "hover:cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-500 focus-visible:ring-offset-2",
           "disabled:pointer-events-none disabled:opacity-50",
           {
             "bg-primary-600 text-white hover:bg-primary-700 active:bg-primary-800":
               variant === "primary",
-            "bg-neutral-100 text-neutral-900 hover:bg-neutral-200":
+            "bg-[var(--color-bg-muted)] text-[var(--color-fg-default)] hover:bg-[var(--color-bg-hover)]":
               variant === "secondary",
-            "hover:bg-neutral-100": variant === "ghost",
-            "bg-red-600 text-white hover:bg-red-700 active:bg-red-800 focus-visible:ring-red-500":
+            "text-[var(--color-fg-default)] hover:bg-[var(--color-bg-hover)]": variant === "ghost",
+            "bg-[var(--color-button-destructive-bg)] text-[var(--color-button-destructive-fg)] hover:bg-[var(--color-button-destructive-hover)] active:bg-[var(--color-button-destructive-active)] focus-visible:ring-[var(--color-button-destructive-ring)]":
               variant === "destructive",
           },
           {
