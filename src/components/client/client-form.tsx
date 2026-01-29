@@ -142,7 +142,7 @@ export function ClientForm({ client }: ClientFormProps) {
       </div>
       <div className="flex justify-between">
         <div className="flex">
-          {isEdit && (
+  {client && (
             <Button
               type="button"
               variant={client.status === "active" ? "destructive" : "secondary"}
