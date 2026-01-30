@@ -48,14 +48,14 @@ export default async function DashboardLayout({
               </Link>
             </nav>
           </div>
-          <div className="flex items-center gap-4">
+          <div className="flex items-center gap-2">
             <span className="hidden text-sm text-[var(--color-fg-muted)] sm:block">
               {user.email}
             </span>
             <ThemeToggle />
             <Link
               href="/settings"
-              className="text-[var(--color-fg-muted)] hover:text-[var(--color-fg-default)]"
+              className="rounded-lg p-2 text-[var(--color-fg-muted)] transition-colors hover:bg-[var(--color-bg-hover)] hover:text-[var(--color-fg-default)]"
               aria-label="Settings"
             >
               <svg
@@ -79,9 +79,25 @@ export default async function DashboardLayout({
               </svg>
             </Link>
             <form action={logout}>
-              <Button type="submit" variant="ghost" size="sm">
-                Logout
-              </Button>
+              <button
+                type="submit"
+                className="rounded-lg p-2 text-[var(--color-fg-muted)] transition-colors hover:bg-[var(--color-bg-hover)] hover:text-[var(--color-fg-default)]"
+                aria-label="Logout"
+              >
+                <svg
+                  className="h-5 w-5"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"
+                  />
+                </svg>
+              </button>
             </form>
           </div>
         </div>
