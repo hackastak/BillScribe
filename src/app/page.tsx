@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 import { Button } from "@/components/ui/button";
 
@@ -7,6 +8,10 @@ export default async function Home() {
   const {
     data: { user },
   } = await supabase.auth.getUser();
+
+  if (user) {
+    redirect("/dashboard");
+  }
 
   return (
     <main className="min-h-screen bg-[var(--color-bg-base)]">
@@ -19,11 +24,6 @@ export default async function Home() {
           >
             BillScribe
           </Link>
-          {user && (
-            <Link href="/dashboard">
-              <Button size="sm">Dashboard</Button>
-            </Link>
-          )}
         </div>
       </header>
 
