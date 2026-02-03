@@ -28,6 +28,7 @@
   },
   "homepage": "https://github.com/hackastak/BillScribe#readme",
   "dependencies": {
+    "@stripe/stripe-js": "^8.7.0",
     "@supabase/ssr": "^0.8.0",
     "@supabase/supabase-js": "^2.90.1",
     "clsx": "^2.1.1",
@@ -38,6 +39,7 @@
     "postgres": "^3.4.8",
     "react": "^19.2.3",
     "react-dom": "^19.2.3",
+    "stripe": "^20.3.0",
     "tailwind-merge": "^3.4.0",
     "zod": "^4.3.5"
   },

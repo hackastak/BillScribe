@@ -1,7 +1,6 @@
 "use client";
 
 import { useRef, useState } from "react";
-import Image from "next/image";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
@@ -141,12 +140,11 @@ export function InvoiceView({
           <div className="flex justify-between items-start">
             <div>
               {profile?.logoUrl && (
-                <Image
+                <img
                   src={profile.logoUrl}
                   alt="Company logo"
-                  width={120}
-                  height={60}
-                  className="mb-4 object-contain"
+                  style={{ maxWidth: 200, maxHeight: 100, width: "auto", height: "auto" }}
+                  className="mb-4"
                 />
               )}
               <h2 className="text-xl font-bold text-neutral-900">
@@ -216,14 +214,14 @@ export function InvoiceView({
               <div className="space-y-2">
                 <div>
                   <span className="text-sm text-neutral-500">Issue Date: </span>
-                  <span className="font-medium">
+                  <span className="font-medium text-neutral-900">
                     {formatDate(invoice.issueDate)}
                   </span>
                 </div>
                 {invoice.dueDate && (
                   <div>
                     <span className="text-sm text-neutral-500">Due Date: </span>
-                    <span className="font-medium">
+                    <span className="font-medium text-neutral-900">
                       {formatDate(invoice.dueDate)}
                     </span>
                   </div>

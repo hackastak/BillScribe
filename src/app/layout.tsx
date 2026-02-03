@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import "./globals.css";
 import { ThemeProvider } from "@/components/providers/theme-provider";
+import { StripeProvider } from "@/components/providers/stripe-provider";
 
 export const metadata: Metadata = {
   title: "BillScribe",
@@ -32,7 +33,9 @@ export default function RootLayout({
         <script dangerouslySetInnerHTML={{ __html: themeScript }} />
       </head>
       <body className="min-h-screen font-sans">
-        <ThemeProvider>{children}</ThemeProvider>
+        <ThemeProvider>
+          <StripeProvider>{children}</StripeProvider>
+        </ThemeProvider>
       </body>
     </html>
   );
