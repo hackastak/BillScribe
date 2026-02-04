@@ -12,6 +12,7 @@ import {
   getClientInvoiceStats,
   type ClientInvoiceStats,
 } from "@/lib/db/queries/invoices";
+import { canCreateClient } from "@/lib/subscriptions/usage";
 import type { ClientStatus } from "@/lib/db/schema/clients";
 
 export type ClientActionState = {
@@ -43,6 +44,12 @@ export async function createClientAction(
 
   if (!user) {
     return { error: "You must be logged in to create a client" };
+  }
+
+  // Check subscription limits
+  const limitCheck = await canCreateClient(user.id);
+  if (!limitCheck.allowed) {
+    return { error: limitCheck.reason };
   }
 
   const rawData = {

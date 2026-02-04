@@ -268,6 +268,15 @@ export async function updateClient(
   return result[0];
 }
 
+export async function getActiveClientCount(userId: string): Promise<number> {
+  const result = await db
+    .select({ count: sql<number>`count(*)::int` })
+    .from(clients)
+    .where(and(eq(clients.userId, userId), eq(clients.status, "active")));
+
+  return result[0]?.count ?? 0;
+}
+
 export async function toggleClientStatus(
   userId: string,
   clientId: string

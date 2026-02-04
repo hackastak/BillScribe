@@ -567,6 +567,24 @@ export async function getInvoices(
   };
 }
 
+export async function getMonthlyInvoiceCount(userId: string): Promise<number> {
+  // Get start of current calendar month
+  const now = new Date();
+  const startOfMonth = new Date(now.getFullYear(), now.getMonth(), 1);
+
+  const result = await db
+    .select({ count: sql<number>`count(*)::int` })
+    .from(invoices)
+    .where(
+      and(
+        eq(invoices.userId, userId),
+        sql`${invoices.createdAt} >= ${startOfMonth}`
+      )
+    );
+
+  return result[0]?.count ?? 0;
+}
+
 export type ClientInvoiceStats = {
   totalInvoices: number;
   paidAmount: number;

@@ -11,6 +11,7 @@ import {
   deleteInvoice,
 } from "@/lib/db/queries/invoices";
 import { updateProfile } from "@/lib/db/queries/profiles";
+import { canCreateInvoice } from "@/lib/subscriptions/usage";
 
 export type InvoiceActionState = {
   error?: string;
@@ -30,6 +31,12 @@ export async function createInvoiceAction(
 
   if (!user) {
     return { error: "You must be logged in to create an invoice" };
+  }
+
+  // Check subscription limits
+  const limitCheck = await canCreateInvoice(user.id);
+  if (!limitCheck.allowed) {
+    return { error: limitCheck.reason };
   }
 
   const itemsJson = formData.get("items")?.toString() || "[]";
