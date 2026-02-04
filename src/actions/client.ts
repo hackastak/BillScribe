@@ -7,6 +7,7 @@ import {
   createClient as createDbClient,
   updateClient as updateDbClient,
   toggleClientStatus as toggleDbClientStatus,
+  getClientById,
 } from "@/lib/db/queries/clients";
 import {
   getClientInvoiceStats,
@@ -156,6 +157,20 @@ export async function toggleClientStatusAction(
   }
 
   try {
+    // Check current status to determine if we're activating
+    const client = await getClientById(user.id, clientId);
+    if (!client) {
+      return { success: false, error: "Client not found" };
+    }
+
+    // If reactivating an inactive client, check subscription limits
+    if (client.status === "inactive") {
+      const limitCheck = await canCreateClient(user.id);
+      if (!limitCheck.allowed) {
+        return { success: false, error: limitCheck.reason };
+      }
+    }
+
     await toggleDbClientStatus(user.id, clientId);
     revalidatePath("/clients");
     return { success: true };
