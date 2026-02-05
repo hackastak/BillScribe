@@ -2,7 +2,7 @@
 
 import { useState } from 'react';
 import { SubscriptionBadge } from './subscription-badge';
-import { PricingTable } from './pricing-table';
+import { PricingCards } from './pricing-cards';
 import type { Subscription } from '@/lib/db/queries/subscriptions';
 
 interface BillingSettingsProps {
@@ -102,19 +102,17 @@ export function BillingSettings({ subscription }: BillingSettingsProps) {
         </div>
       </div>
 
-      {/* Pricing Table for non-subscribers */}
-      {!isSubscribed && (
-        <div className="rounded-lg border border-[var(--color-border-default)] bg-[var(--color-bg-elevated)]">
-          <div className="border-b border-[var(--color-border-default)] px-6 py-4">
-            <h2 className="text-lg font-semibold text-[var(--color-fg-default)]">
-              Choose a Plan
-            </h2>
-          </div>
-          <div className="px-6 py-4">
-            <PricingTable />
-          </div>
+      {/* Pricing Cards */}
+      <div className="rounded-lg border border-[var(--color-border-default)] bg-[var(--color-bg-elevated)]">
+        <div className="border-b border-[var(--color-border-default)] px-6 py-4">
+          <h2 className="text-lg font-semibold text-[var(--color-fg-default)]">
+            {isSubscribed ? 'Change Plan' : 'Choose a Plan'}
+          </h2>
         </div>
-      )}
+        <div className="px-6 py-4">
+          <PricingCards currentPriceId={subscription?.stripePriceId} />
+        </div>
+      </div>
     </div>
   );
 }
