@@ -1,5 +1,6 @@
 "use client";
 
+import { useState } from "react";
 import { useActionState, useTransition } from "react";
 import { useRouter } from "next/navigation";
 import { useFormStatus } from "react-dom";
@@ -32,12 +33,18 @@ function SubmitButton({ isEdit }: { isEdit: boolean }) {
 export function ClientForm({ client }: ClientFormProps) {
   const router = useRouter();
   const isEdit = !!client;
-  const [, startTransition] = useTransition();
+  const [isPending, startTransition] = useTransition();
+  const [toggleError, setToggleError] = useState<string | null>(null);
 
   const handleToggleStatus = (clientId: string) => {
+    setToggleError(null);
     startTransition(async () => {
-      await toggleClientStatusAction(clientId);
-      router.push("/clients");
+      const result = await toggleClientStatusAction(clientId);
+      if (result.success) {
+        router.push("/clients");
+      } else if (result.error) {
+        setToggleError(result.error);
+      }
     });
   };
 
@@ -57,9 +64,9 @@ export function ClientForm({ client }: ClientFormProps) {
     <form action={formAction} className="space-y-6">
       {isEdit && <input type="hidden" name="clientId" value={client.id} />}
 
-      {state.error && (
+      {(state.error || toggleError) && (
         <div className="rounded-lg bg-error-50 px-4 py-3 text-sm text-error-700 border border-error-200">
-          {state.error}
+          {state.error || toggleError}
         </div>
       )}
 
@@ -147,8 +154,9 @@ export function ClientForm({ client }: ClientFormProps) {
               type="button"
               variant={client.status === "active" ? "destructive" : "secondary"}
               onClick={() => handleToggleStatus(client.id)}
+              disabled={isPending}
             >
-              {client.status === "active" ? "Deactivate" : "Activate"}
+              {isPending ? <Spinner size="sm" /> : client.status === "active" ? "Deactivate" : "Activate"}
             </Button>
           )}
         </div>

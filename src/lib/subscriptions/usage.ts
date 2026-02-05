@@ -54,7 +54,7 @@ export async function canCreateClient(
     const tierName = getTierDisplayName(tier);
     return {
       allowed: false,
-      reason: `You've reached the maximum of ${limits.maxClients} clients on the ${tierName} plan. Upgrade to add more clients.`,
+      reason: `You've reached the maximum of ${limits.maxClients} clients on the ${tierName} plan. Upgrade to add more active clients.`,
     };
   }
 
