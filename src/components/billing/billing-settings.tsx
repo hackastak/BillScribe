@@ -43,15 +43,15 @@ export function BillingSettings({ subscription }: BillingSettingsProps) {
     <div className="space-y-6">
       {/* Current Subscription Card */}
       <div className="rounded-lg border border-[var(--color-border-default)] bg-[var(--color-bg-elevated)]">
-        <div className="border-b border-[var(--color-border-default)] px-6 py-4">
+        <div className="border-b border-[var(--color-border-default)] px-4 py-3 sm:px-6 sm:py-4">
           <div className="flex items-center justify-between">
-            <h2 className="text-lg font-semibold text-[var(--color-fg-default)]">
+            <h2 className="text-base sm:text-lg font-semibold text-[var(--color-fg-default)]">
               Subscription
             </h2>
             <SubscriptionBadge status={subscription?.status || null} />
           </div>
         </div>
-        <div className="px-6 py-4">
+        <div className="px-4 py-3 sm:px-6 sm:py-4">
           {isSubscribed ? (
             <div className="space-y-4">
               <p className="text-sm text-[var(--color-fg-muted)]">
@@ -104,12 +104,12 @@ export function BillingSettings({ subscription }: BillingSettingsProps) {
 
       {/* Pricing Cards */}
       <div className="rounded-lg border border-[var(--color-border-default)] bg-[var(--color-bg-elevated)]">
-        <div className="border-b border-[var(--color-border-default)] px-6 py-4">
-          <h2 className="text-lg font-semibold text-[var(--color-fg-default)]">
+        <div className="border-b border-[var(--color-border-default)] px-4 py-3 sm:px-6 sm:py-4">
+          <h2 className="text-base sm:text-lg font-semibold text-[var(--color-fg-default)]">
             {isSubscribed ? 'Change Plan' : 'Choose a Plan'}
           </h2>
         </div>
-        <div className="px-6 py-4">
+        <div className="px-4 py-3 sm:px-6 sm:py-4">
           <PricingCards currentPriceId={subscription?.stripePriceId} />
         </div>
       </div>

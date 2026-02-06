@@ -21,8 +21,8 @@ export function InvoicePreviewModal({
   if (!invoice) return null;
 
   return (
-    <Modal isOpen={isOpen} onClose={onClose} className="max-w-5xl">
-      <div className="p-6">
+    <Modal isOpen={isOpen} onClose={onClose} className="max-w-[calc(100vw-2rem)] sm:max-w-xl md:max-w-3xl lg:max-w-5xl">
+      <div className="p-4 sm:p-6">
         <InvoiceView invoice={invoice} profile={profile} showBackLink={false} />
       </div>
     </Modal>

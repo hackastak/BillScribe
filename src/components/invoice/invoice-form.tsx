@@ -181,7 +181,7 @@ export function InvoiceForm({
 
   return (
     <>
-      <div className="space-y-6">
+      <div className="space-y-4 sm:space-y-6">
         {isReadOnly && (
           <div className="rounded-lg bg-[var(--color-status-warning-bg)] border border-[var(--color-status-warning-border)] p-4">
             <div className="flex">
@@ -215,7 +215,7 @@ export function InvoiceForm({
         )}
 
         <Card>
-          <div className="grid gap-6 md:grid-cols-2">
+          <div className="grid gap-4 sm:gap-6 md:grid-cols-2">
             <ClientSelector
               clients={clientList}
               selectedClientId={selectedClientId}
@@ -290,7 +290,7 @@ export function InvoiceForm({
         </Card>
 
         <Card>
-          <div className="grid gap-6 md:grid-cols-2">
+          <div className="grid gap-4 sm:gap-6 md:grid-cols-2">
             <div className="space-y-2">
               <Label htmlFor="notes">Notes</Label>
               <Textarea
@@ -343,28 +343,30 @@ export function InvoiceForm({
           </div>
         </Card>
 
-        <div className="flex justify-between">
+        <div className="flex flex-col-reverse gap-3 sm:flex-row sm:justify-between">
           <div>
             {invoice && !isReadOnly && (
               <Button
                 type="button"
                 variant="destructive"
                 onClick={() => setShowDeleteConfirm(true)}
+                className="w-full sm:w-auto"
               >
                 Delete Invoice
               </Button>
             )}
           </div>
-          <div className="flex gap-3">
+          <div className="flex flex-col gap-2 sm:flex-row sm:gap-3">
             <Button
               type="button"
               variant="secondary"
               onClick={() => router.back()}
+              className="w-full sm:w-auto"
             >
               {isReadOnly ? "Go Back" : "Cancel"}
             </Button>
             {!isReadOnly && (
-              <Button type="button" onClick={handlePreview}>
+              <Button type="button" onClick={handlePreview} className="w-full sm:w-auto">
                 Preview Invoice
               </Button>
             )}

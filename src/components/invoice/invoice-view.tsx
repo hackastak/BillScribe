@@ -83,9 +83,9 @@ export function InvoiceView({
   };
 
   return (
-    <div className="space-y-6">
-      <div className="flex items-center justify-between">
-        <div className="flex items-center gap-4">
+    <div className="space-y-4 sm:space-y-6">
+      <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+        <div className="flex items-center gap-3 sm:gap-4">
           {showBackLink && (
             <Link
               href="/dashboard"
@@ -106,7 +106,7 @@ export function InvoiceView({
               </svg>
             </Link>
           )}
-          <h1 className="text-2xl font-bold text-[var(--color-fg-default)]">
+          <h1 className="text-xl sm:text-2xl font-bold text-[var(--color-fg-default)]">
             {invoice.invoiceNumber}
           </h1>
           <InvoiceStatusSelect
@@ -114,7 +114,7 @@ export function InvoiceView({
             initialStatus={invoice.status}
           />
         </div>
-        <div className="flex items-center gap-3 mr-12">
+        <div className="flex flex-wrap items-center gap-2 sm:gap-3 sm:mr-12">
           <Button
             variant="secondary"
             size="sm"
@@ -134,10 +134,10 @@ export function InvoiceView({
         </div>
       </div>
 
-      <Card className="p-8 !bg-white" ref={invoiceRef}>
-        <div className="space-y-8">
+      <Card className="p-4 sm:p-6 md:p-8 !bg-white" ref={invoiceRef}>
+        <div className="space-y-6 sm:space-y-8">
           {/* Header */}
-          <div className="flex justify-between items-start">
+          <div className="flex flex-col gap-4 sm:flex-row sm:justify-between sm:items-start">
             <div>
               {profile?.logoUrl && (
                 <img
@@ -172,7 +172,7 @@ export function InvoiceView({
           </div>
 
           {/* Client & Dates */}
-          <div className="grid grid-cols-2 gap-8">
+          <div className="grid gap-4 sm:gap-8 sm:grid-cols-2">
             <div>
               <h3 className="text-sm font-medium text-neutral-500 uppercase tracking-wide">
                 Bill To
@@ -210,7 +210,7 @@ export function InvoiceView({
               )}
             </div>
 
-            <div className="text-right">
+            <div className="sm:text-right">
               <div className="space-y-2">
                 <div>
                   <span className="text-sm text-neutral-500">Issue Date: </span>

@@ -148,7 +148,61 @@ export function InvoicesTable({
         </select>
       </div>
 
-      <div className="overflow-hidden rounded-lg border border-[var(--color-border-default)] bg-[var(--color-bg-surface)] shadow-sm">
+      {/* Mobile Card View */}
+      <div className="space-y-3 md:hidden">
+        {invoices.length === 0 ? (
+          <div className="rounded-lg border border-[var(--color-border-default)] bg-[var(--color-bg-surface)] p-6 text-center text-[var(--color-fg-subtle)]">
+            No invoices found.
+          </div>
+        ) : (
+          invoices.map((invoice) => (
+            <div
+              key={invoice.id}
+              className="rounded-lg border border-[var(--color-border-default)] bg-[var(--color-bg-surface)] p-4 shadow-sm"
+            >
+              <div className="flex items-start justify-between gap-2">
+                <div className="min-w-0 flex-1">
+                  <p className="font-medium text-[var(--color-fg-default)]">
+                    {invoice.invoiceNumber}
+                  </p>
+                  <p className="text-sm text-[var(--color-fg-muted)] truncate">
+                    {invoice.client?.name || "No Client"}
+                  </p>
+                </div>
+                <p className="text-lg font-semibold text-[var(--color-fg-default)]">
+                  {formatCurrency(invoice.total)}
+                </p>
+              </div>
+              <div className="mt-3 flex items-center gap-4 text-sm text-[var(--color-fg-muted)]">
+                <span>Due: {invoice.dueDate ? formatDate(invoice.dueDate) : "-"}</span>
+              </div>
+              <div className="mt-3 flex items-center justify-between gap-2">
+                <InvoiceStatusSelect
+                  invoiceId={invoice.id}
+                  initialStatus={invoice.status}
+                />
+                <div className="flex items-center gap-2">
+                  <Button
+                    variant="secondary"
+                    size="sm"
+                    onClick={() => handlePreview(invoice)}
+                  >
+                    Preview
+                  </Button>
+                  <Link href={`/invoices/${invoice.id}/edit`}>
+                    <Button variant="secondary" size="sm">
+                      Edit
+                    </Button>
+                  </Link>
+                </div>
+              </div>
+            </div>
+          ))
+        )}
+      </div>
+
+      {/* Desktop Table View */}
+      <div className="hidden md:block overflow-hidden rounded-lg border border-[var(--color-border-default)] bg-[var(--color-bg-surface)] shadow-sm">
         <div className="overflow-x-auto">
           <table className="w-full">
             <thead className="bg-[var(--color-bg-muted)] text-left text-xs font-medium uppercase tracking-wider text-[var(--color-fg-subtle)]">

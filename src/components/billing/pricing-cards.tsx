@@ -104,7 +104,7 @@ export function PricingCards({ currentPriceId }: PricingCardsProps) {
         </div>
       )}
 
-      <div className="grid gap-4 lg:grid-cols-3">
+      <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
         {PLANS.map((plan) => {
           const isCurrentPlan = currentPlanId === plan.id;
           const isLoading = loadingPlan === plan.id;
@@ -120,7 +120,7 @@ export function PricingCards({ currentPriceId }: PricingCardsProps) {
                 plan.highlighted && 'ring-2 ring-[var(--color-brand-primary)]'
               )}
             >
-              <div className="flex flex-1 flex-col p-8">
+              <div className="flex flex-1 flex-col p-4 sm:p-6 md:p-8">
                 {/* Plan name */}
                 <div className="mb-6 flex items-center gap-2">
                   <h3 className="text-sm font-semibold uppercase tracking-wide text-[var(--color-fg-muted)]">

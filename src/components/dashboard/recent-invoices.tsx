@@ -54,61 +54,100 @@ export function RecentInvoices({ invoices }: RecentInvoicesProps) {
             </Link>
           </div>
         ) : (
-          <div className="overflow-x-auto">
-            <table className="w-full">
-              <thead>
-                <tr className="border-b border-[var(--color-border-default)]">
-                  <th className="pb-3 text-left text-sm font-medium text-[var(--color-fg-muted)]">
-                    Invoice
-                  </th>
-                  <th className="pb-3 text-left text-sm font-medium text-[var(--color-fg-muted)]">
-                    Client
-                  </th>
-                  <th className="pb-3 text-left text-sm font-medium text-[var(--color-fg-muted)]">
-                    Status
-                  </th>
-                  <th className="pb-3 text-left text-sm font-medium text-[var(--color-fg-muted)]">
-                    Date
-                  </th>
-                  <th className="pb-3 text-right text-sm font-medium text-[var(--color-fg-muted)]">
-                    Amount
-                  </th>
-                </tr>
-              </thead>
-              <tbody>
-                {invoices.map((invoice) => (
-                  <tr
-                    key={invoice.id}
-                    className="border-b border-[var(--color-border-muted)] last:border-0"
-                  >
-                    <td className="py-4">
+          <>
+            {/* Mobile Card View */}
+            <div className="space-y-3 md:hidden">
+              {invoices.map((invoice) => (
+                <div
+                  key={invoice.id}
+                  className="rounded-lg border border-[var(--color-border-muted)] p-3"
+                >
+                  <div className="flex items-start justify-between gap-2">
+                    <div className="min-w-0 flex-1">
                       <Link
                         href={`/invoices/${invoice.id}`}
                         className="font-medium text-[var(--color-fg-default)] hover:text-primary-600"
                       >
                         {invoice.invoiceNumber}
                       </Link>
-                    </td>
-                    <td className="py-4 text-[var(--color-fg-muted)]">
-                      {invoice.clientName ?? "No client"}
-                    </td>
-                    <td className="py-4">
-                      <InvoiceStatusSelect
-                        invoiceId={invoice.id}
-                        initialStatus={invoice.status}
-                      />
-                    </td>
-                    <td className="py-4 text-[var(--color-fg-muted)]">
-                      {formatDate(invoice.issueDate)}
-                    </td>
-                    <td className="py-4 text-right font-medium text-[var(--color-fg-default)]">
+                      <p className="text-sm text-[var(--color-fg-muted)] truncate">
+                        {invoice.clientName ?? "No client"}
+                      </p>
+                    </div>
+                    <p className="text-base font-semibold text-[var(--color-fg-default)]">
                       {formatCurrency(invoice.total)}
-                    </td>
+                    </p>
+                  </div>
+                  <div className="mt-2 flex items-center justify-between">
+                    <span className="text-xs text-[var(--color-fg-muted)]">
+                      {formatDate(invoice.issueDate)}
+                    </span>
+                    <InvoiceStatusSelect
+                      invoiceId={invoice.id}
+                      initialStatus={invoice.status}
+                    />
+                  </div>
+                </div>
+              ))}
+            </div>
+
+            {/* Desktop Table View */}
+            <div className="hidden md:block overflow-x-auto">
+              <table className="w-full">
+                <thead>
+                  <tr className="border-b border-[var(--color-border-default)]">
+                    <th className="pb-3 text-left text-sm font-medium text-[var(--color-fg-muted)]">
+                      Invoice
+                    </th>
+                    <th className="pb-3 text-left text-sm font-medium text-[var(--color-fg-muted)]">
+                      Client
+                    </th>
+                    <th className="pb-3 text-left text-sm font-medium text-[var(--color-fg-muted)]">
+                      Status
+                    </th>
+                    <th className="pb-3 text-left text-sm font-medium text-[var(--color-fg-muted)]">
+                      Date
+                    </th>
+                    <th className="pb-3 text-right text-sm font-medium text-[var(--color-fg-muted)]">
+                      Amount
+                    </th>
                   </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
+                </thead>
+                <tbody>
+                  {invoices.map((invoice) => (
+                    <tr
+                      key={invoice.id}
+                      className="border-b border-[var(--color-border-muted)] last:border-0"
+                    >
+                      <td className="py-4">
+                        <Link
+                          href={`/invoices/${invoice.id}`}
+                          className="font-medium text-[var(--color-fg-default)] hover:text-primary-600"
+                        >
+                          {invoice.invoiceNumber}
+                        </Link>
+                      </td>
+                      <td className="py-4 text-[var(--color-fg-muted)]">
+                        {invoice.clientName ?? "No client"}
+                      </td>
+                      <td className="py-4">
+                        <InvoiceStatusSelect
+                          invoiceId={invoice.id}
+                          initialStatus={invoice.status}
+                        />
+                      </td>
+                      <td className="py-4 text-[var(--color-fg-muted)]">
+                        {formatDate(invoice.issueDate)}
+                      </td>
+                      <td className="py-4 text-right font-medium text-[var(--color-fg-default)]">
+                        {formatCurrency(invoice.total)}
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          </>
         )}
       </CardContent>
     </Card>
