@@ -243,7 +243,7 @@ export function InvoiceForm({
               </div>
 
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                <div className="space-y-2">
+                <div className="min-w-0 space-y-2">
                   <Label htmlFor="issueDate">Issue Date *</Label>
                   <Input
                     id="issueDate"
@@ -259,7 +259,7 @@ export function InvoiceForm({
                     </p>
                   )}
                 </div>
-                <div className="space-y-2">
+                <div className="min-w-0 space-y-2">
                   <Label htmlFor="dueDate">Due Date</Label>
                   <Input
                     id="dueDate"

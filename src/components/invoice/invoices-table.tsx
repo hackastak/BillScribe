@@ -1,14 +1,141 @@
 "use client";
 
-import { useState, useRef } from "react";
+import { useState, useRef, useEffect } from "react";
+import { createPortal } from "react-dom";
 import Link from "next/link";
 import { useRouter, usePathname, useSearchParams } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { InvoiceStatusSelect } from "@/components/invoice/invoice-status-select";
 import { InvoicePreviewModal } from "@/components/invoice/invoice-preview-modal";
+import { downloadInvoicePdf } from "@/lib/pdf";
+import { cn } from "@/lib/utils";
 import type { InvoiceWithDetails } from "@/lib/db/queries/invoices";
 import type { Profile } from "@/lib/db/queries/profiles";
+
+interface ActionMenuProps {
+  invoice: InvoiceWithDetails;
+  isOpen: boolean;
+  onToggle: () => void;
+  onClose: () => void;
+  onPreview: () => void;
+  onDownload: () => void;
+  isDownloading: boolean;
+}
+
+function ActionMenu({
+  invoice,
+  isOpen,
+  onToggle,
+  onClose,
+  onPreview,
+  onDownload,
+  isDownloading,
+}: ActionMenuProps) {
+  const buttonRef = useRef<HTMLButtonElement>(null);
+  const [menuPosition, setMenuPosition] = useState({ top: 0, right: 0 });
+  const [mounted, setMounted] = useState(false);
+
+  useEffect(() => {
+    setMounted(true);
+  }, []);
+
+  useEffect(() => {
+    if (isOpen && buttonRef.current) {
+      const rect = buttonRef.current.getBoundingClientRect();
+      setMenuPosition({
+        top: rect.bottom + window.scrollY + 8,
+        right: window.innerWidth - rect.right,
+      });
+    }
+  }, [isOpen]);
+
+  const menuContent = isOpen && mounted ? createPortal(
+    <div
+      className="fixed z-[9999] w-40 rounded-lg border border-[var(--color-border-default)] bg-[var(--color-bg-surface)] shadow-lg"
+      style={{
+        top: menuPosition.top,
+        right: menuPosition.right,
+      }}
+      data-action-menu
+    >
+      <div className="py-1">
+        <button
+          type="button"
+          onClick={() => {
+            onPreview();
+            onClose();
+          }}
+          className="flex w-full items-center gap-3 px-4 py-2 text-sm text-[var(--color-fg-default)] hover:bg-[var(--color-bg-hover)]"
+        >
+          <svg className="h-4 w-4 text-[var(--color-fg-muted)]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
+          </svg>
+          Preview
+        </button>
+        <button
+          type="button"
+          onClick={() => {
+            onDownload();
+            onClose();
+          }}
+          disabled={isDownloading}
+          className="flex w-full items-center gap-3 px-4 py-2 text-sm text-[var(--color-fg-default)] hover:bg-[var(--color-bg-hover)] disabled:opacity-50"
+        >
+          {isDownloading ? (
+            <svg className="h-4 w-4 animate-spin text-[var(--color-fg-muted)]" fill="none" viewBox="0 0 24 24">
+              <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
+              <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z" />
+            </svg>
+          ) : (
+            <svg className="h-4 w-4 text-[var(--color-fg-muted)]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
+            </svg>
+          )}
+          {isDownloading ? "Downloading..." : "Download"}
+        </button>
+        <Link
+          href={`/invoices/${invoice.id}/edit`}
+          onClick={onClose}
+          className="flex w-full items-center gap-3 px-4 py-2 text-sm text-[var(--color-fg-default)] hover:bg-[var(--color-bg-hover)]"
+        >
+          <svg className="h-4 w-4 text-[var(--color-fg-muted)]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
+          </svg>
+          Edit
+        </Link>
+      </div>
+    </div>,
+    document.body
+  ) : null;
+
+  return (
+    <div className="relative inline-block" data-action-menu>
+      <button
+        ref={buttonRef}
+        type="button"
+        onClick={onToggle}
+        className={cn(
+          "rounded-lg p-2 transition-colors",
+          "text-[var(--color-fg-muted)] hover:text-[var(--color-fg-default)]",
+          "hover:bg-[var(--color-bg-hover)] border border-[var(--color-border-default)]",
+          isOpen && "bg-[var(--color-bg-hover)] text-[var(--color-fg-default)]"
+        )}
+        aria-label="Invoice actions"
+        aria-expanded={isOpen}
+        aria-haspopup="true"
+      >
+        <svg className="h-4 w-4" fill="currentColor" viewBox="0 0 24 24">
+          <circle cx="12" cy="5" r="2" />
+          <circle cx="12" cy="12" r="2" />
+          <circle cx="12" cy="19" r="2" />
+        </svg>
+      </button>
+      {menuContent}
+    </div>
+  );
+}
 
 interface InvoicesTableProps {
   invoices: InvoiceWithDetails[];
@@ -36,7 +163,35 @@ export function InvoicesTable({
   const [selectedInvoice, setSelectedInvoice] =
     useState<InvoiceWithDetails | null>(null);
   const [isPreviewOpen, setIsPreviewOpen] = useState(false);
+  const [downloadingInvoiceId, setDownloadingInvoiceId] = useState<string | null>(null);
+  const [openMenuId, setOpenMenuId] = useState<string | null>(null);
   const timeoutRef = useRef<NodeJS.Timeout>(null);
+
+  // Close dropdown when clicking outside
+  useEffect(() => {
+    function handleClickOutside(event: MouseEvent) {
+      const target = event.target as HTMLElement;
+      // Check if click is inside any action menu
+      if (!target.closest('[data-action-menu]')) {
+        setOpenMenuId(null);
+      }
+    }
+
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, []);
+
+  // Close dropdown on escape key
+  useEffect(() => {
+    function handleEscape(event: KeyboardEvent) {
+      if (event.key === "Escape") {
+        setOpenMenuId(null);
+      }
+    }
+
+    document.addEventListener("keydown", handleEscape);
+    return () => document.removeEventListener("keydown", handleEscape);
+  }, []);
 
   const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const value = e.target.value;
@@ -87,6 +242,17 @@ export function InvoicesTable({
   const handlePreview = (invoice: InvoiceWithDetails) => {
     setSelectedInvoice(invoice);
     setIsPreviewOpen(true);
+  };
+
+  const handleDownload = async (invoice: InvoiceWithDetails) => {
+    try {
+      setDownloadingInvoiceId(invoice.id);
+      await downloadInvoicePdf(invoice, profile);
+    } catch (error) {
+      console.error("Error generating PDF:", error);
+    } finally {
+      setDownloadingInvoiceId(null);
+    }
   };
 
   function formatCurrency(amount: string | number): string {
@@ -181,20 +347,15 @@ export function InvoicesTable({
                   invoiceId={invoice.id}
                   initialStatus={invoice.status}
                 />
-                <div className="flex items-center gap-2">
-                  <Button
-                    variant="secondary"
-                    size="sm"
-                    onClick={() => handlePreview(invoice)}
-                  >
-                    Preview
-                  </Button>
-                  <Link href={`/invoices/${invoice.id}/edit`}>
-                    <Button variant="secondary" size="sm">
-                      Edit
-                    </Button>
-                  </Link>
-                </div>
+                <ActionMenu
+                  invoice={invoice}
+                  isOpen={openMenuId === invoice.id}
+                  onToggle={() => setOpenMenuId(openMenuId === invoice.id ? null : invoice.id)}
+                  onClose={() => setOpenMenuId(null)}
+                  onPreview={() => handlePreview(invoice)}
+                  onDownload={() => handleDownload(invoice)}
+                  isDownloading={downloadingInvoiceId === invoice.id}
+                />
               </div>
             </div>
           ))
@@ -251,20 +412,15 @@ export function InvoicesTable({
                       {formatCurrency(invoice.total)}
                     </td>
                     <td className="px-6 py-4 text-right">
-                      <div className="flex items-center justify-end gap-2">
-                        <Button
-                          variant="secondary"
-                          size="sm"
-                          onClick={() => handlePreview(invoice)}
-                        >
-                          Preview
-                        </Button>
-                        <Link href={`/invoices/${invoice.id}/edit`}>
-                          <Button variant="secondary" size="sm">
-                            Edit
-                          </Button>
-                        </Link>
-                      </div>
+                      <ActionMenu
+                        invoice={invoice}
+                        isOpen={openMenuId === invoice.id}
+                        onToggle={() => setOpenMenuId(openMenuId === invoice.id ? null : invoice.id)}
+                        onClose={() => setOpenMenuId(null)}
+                        onPreview={() => handlePreview(invoice)}
+                        onDownload={() => handleDownload(invoice)}
+                        isDownloading={downloadingInvoiceId === invoice.id}
+                      />
                     </td>
                   </tr>
                 ))
