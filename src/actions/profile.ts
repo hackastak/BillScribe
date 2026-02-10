@@ -3,6 +3,7 @@
 import { createClient } from "@/lib/supabase/server";
 import { updateProfile } from "@/lib/db/queries/profiles";
 import { z } from "zod";
+import type { InvoiceTemplate } from "@/lib/db/schema/profiles";
 
 const profileSchema = z.object({
   fullName: z.string().optional(),
@@ -10,6 +11,8 @@ const profileSchema = z.object({
   phone: z.string().optional(),
   address: z.string().optional(),
 });
+
+const validTemplates = ["classic", "simple", "modern", "professional", "creative"] as const;
 
 export type ProfileActionState = {
   error?: string;
@@ -59,5 +62,38 @@ export async function updateProfileAction(
   } catch (error) {
     console.error("Error updating profile:", error);
     return { error: "Failed to update profile. Please try again." };
+  }
+}
+
+export type TemplateActionState = {
+  error?: string;
+  success?: boolean;
+};
+
+export async function updateInvoiceTemplateAction(
+  template: InvoiceTemplate
+): Promise<TemplateActionState> {
+  const supabase = await createClient();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+
+  if (!user) {
+    return { error: "You must be logged in to update your template" };
+  }
+
+  if (!validTemplates.includes(template)) {
+    return { error: "Invalid template selected" };
+  }
+
+  try {
+    await updateProfile(user.id, {
+      invoiceTemplate: template,
+    });
+
+    return { success: true };
+  } catch (error) {
+    console.error("Error updating invoice template:", error);
+    return { error: "Failed to update template. Please try again." };
   }
 }

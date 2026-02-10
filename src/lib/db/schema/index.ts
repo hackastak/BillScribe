@@ -1,4 +1,4 @@
-export { profiles } from './profiles';
+export { profiles, invoiceTemplateEnum } from './profiles';
 export { clients } from './clients';
 export { invoices, invoiceStatusEnum } from './invoices';
 export { invoiceItems } from './invoice-items';

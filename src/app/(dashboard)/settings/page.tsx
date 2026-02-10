@@ -3,6 +3,7 @@ import { createClient } from "@/lib/supabase/server";
 import { getProfile } from "@/lib/db/queries/profiles";
 import { LogoUpload } from "@/components/invoice/logo-upload";
 import { ProfileSettings } from "@/components/settings/profile-settings";
+import { InvoiceTemplateSettings } from "@/components/settings/invoice-template-settings";
 
 export default async function SettingsPage() {
   const supabase = await createClient();
@@ -28,6 +29,7 @@ export default async function SettingsPage() {
       <div className="space-y-6">
         <LogoUpload currentLogoUrl={profile?.logoUrl || null} />
         <ProfileSettings profile={profile} />
+        <InvoiceTemplateSettings currentTemplate={profile?.invoiceTemplate || null} />
       </div>
     </div>
   );

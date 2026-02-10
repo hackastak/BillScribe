@@ -1,6 +1,7 @@
 import { db } from "@/lib/db";
 import { profiles } from "@/lib/db/schema";
 import { eq } from "drizzle-orm";
+import type { InvoiceTemplate } from "@/lib/db/schema/profiles";
 
 export type Profile = {
   id: string;
@@ -10,6 +11,7 @@ export type Profile = {
   phone: string | null;
   address: string | null;
   logoUrl: string | null;
+  invoiceTemplate: InvoiceTemplate | null;
 };
 
 export async function getProfile(userId: string): Promise<Profile | null> {
@@ -22,6 +24,7 @@ export async function getProfile(userId: string): Promise<Profile | null> {
       phone: profiles.phone,
       address: profiles.address,
       logoUrl: profiles.logoUrl,
+      invoiceTemplate: profiles.invoiceTemplate,
     })
     .from(profiles)
     .where(eq(profiles.id, userId))
@@ -36,6 +39,7 @@ export type UpdateProfileData = {
   phone?: string;
   address?: string;
   logoUrl?: string;
+  invoiceTemplate?: InvoiceTemplate;
 };
 
 export async function updateProfile(
@@ -57,6 +61,7 @@ export async function updateProfile(
       phone: profiles.phone,
       address: profiles.address,
       logoUrl: profiles.logoUrl,
+      invoiceTemplate: profiles.invoiceTemplate,
     });
 
   return result || null;
