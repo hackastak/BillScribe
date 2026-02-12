@@ -19,6 +19,138 @@ function formatDateForPdf(dateStr: string | null): string {
 }
 
 // ============================================================================
+// TEMPLATE 0: DEFAULT
+// The original invoice template - clean and straightforward
+// ============================================================================
+function generateDefaultTemplate(
+  invoice: InvoiceWithDetails,
+  profile: Profile | null
+): string {
+  const itemsHtml = invoice.items
+    .map(
+      (item) => `
+      <tr>
+        <td style="padding: 12px 16px; font-size: 14px; color: #111827;">${item.description}</td>
+        <td style="padding: 12px 16px; text-align: center; font-size: 14px; color: #4b5563;">${item.quantity}</td>
+        <td style="padding: 12px 16px; text-align: right; font-size: 14px; color: #4b5563;">$${parseFloat(item.unitPrice).toFixed(2)}</td>
+        <td style="padding: 12px 16px; text-align: right; font-size: 14px; font-weight: 500; color: #111827;">$${parseFloat(item.amount).toFixed(2)}</td>
+      </tr>
+    `
+    )
+    .join("");
+
+  return `
+    <div style="padding: 32px; font-family: system-ui, -apple-system, sans-serif; width: 800px; min-height: 1131px; background: white; box-sizing: border-box; display: flex; flex-direction: column;">
+      <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 32px;">
+        <div>
+          ${profile?.logoUrl ? `<img src="${profile.logoUrl}" alt="Logo" style="max-width: 200px; max-height: 100px; margin-bottom: 16px;" />` : ""}
+          <h2 style="font-size: 20px; font-weight: bold; color: #111827; margin: 0;">${profile?.companyName || "Your Company"}</h2>
+          ${profile?.address ? `<p style="margin: 4px 0 0; font-size: 14px; color: #4b5563; white-space: pre-line;">${profile.address}</p>` : ""}
+          ${profile?.phone ? `<p style="margin: 2px 0 0; font-size: 14px; color: #4b5563;">${profile.phone}</p>` : ""}
+          ${profile?.email ? `<p style="margin: 2px 0 0; font-size: 14px; color: #4b5563;">${profile.email}</p>` : ""}
+        </div>
+        <div style="text-align: right;">
+          <h1 style="font-size: 30px; font-weight: bold; color: #111827; margin: 0;">INVOICE</h1>
+          <p style="margin: 8px 0 0; font-size: 18px; font-weight: 500; color: #374151;">${invoice.invoiceNumber}</p>
+        </div>
+      </div>
+
+      <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 32px; margin-bottom: 32px;">
+        <div>
+          <h3 style="font-size: 12px; font-weight: 500; color: #6b7280; text-transform: uppercase; letter-spacing: 0.05em; margin: 0;">Bill To</h3>
+          ${
+            invoice.client
+              ? `
+            <div style="margin-top: 8px;">
+              <p style="font-weight: 500; color: #111827; margin: 0;">${invoice.client.name}</p>
+              ${invoice.client.company ? `<p style="font-size: 14px; color: #4b5563; margin: 2px 0 0;">${invoice.client.company}</p>` : ""}
+              ${invoice.client.address ? `<p style="font-size: 14px; color: #4b5563; margin: 2px 0 0; white-space: pre-line;">${invoice.client.address}</p>` : ""}
+              ${invoice.client.email ? `<p style="font-size: 14px; color: #4b5563; margin: 2px 0 0;">${invoice.client.email}</p>` : ""}
+              ${invoice.client.phone ? `<p style="font-size: 14px; color: #4b5563; margin: 2px 0 0;">${invoice.client.phone}</p>` : ""}
+            </div>
+          `
+              : `<p style="margin-top: 8px; font-size: 14px; color: #9ca3af;">No client selected</p>`
+          }
+        </div>
+        <div style="text-align: right;">
+          <div>
+            <span style="font-size: 14px; color: #6b7280;">Issue Date: </span>
+            <span style="font-weight: 500; color: #111827;">${formatDateForPdf(invoice.issueDate)}</span>
+          </div>
+          ${
+            invoice.dueDate
+              ? `
+            <div style="margin-top: 8px;">
+              <span style="font-size: 14px; color: #6b7280;">Due Date: </span>
+              <span style="font-weight: 500; color: #111827;">${formatDateForPdf(invoice.dueDate)}</span>
+            </div>
+          `
+              : ""
+          }
+        </div>
+      </div>
+
+      <table style="width: 100%; border-collapse: collapse; border: 1px solid #e5e7eb; border-radius: 8px; overflow: hidden;">
+        <thead style="background: #f9fafb;">
+          <tr>
+            <th style="padding: 12px 16px; text-align: left; font-size: 14px; font-weight: 500; color: #4b5563;">Description</th>
+            <th style="width: 96px; padding: 12px 16px; text-align: center; font-size: 14px; font-weight: 500; color: #4b5563;">Qty</th>
+            <th style="width: 112px; padding: 12px 16px; text-align: right; font-size: 14px; font-weight: 500; color: #4b5563;">Unit Price</th>
+            <th style="width: 112px; padding: 12px 16px; text-align: right; font-size: 14px; font-weight: 500; color: #4b5563;">Amount</th>
+          </tr>
+        </thead>
+        <tbody>
+          ${itemsHtml}
+        </tbody>
+      </table>
+
+      <div style="display: flex; justify-content: flex-end; margin-top: 24px;">
+        <div style="width: 256px;">
+          ${
+            invoice.subtotal
+              ? `
+            <div style="display: flex; justify-content: space-between; font-size: 14px; margin-bottom: 8px;">
+              <span style="color: #4b5563;">Subtotal</span>
+              <span style="font-weight: 500; color: #374151;">$${parseFloat(invoice.subtotal).toFixed(2)}</span>
+            </div>
+          `
+              : ""
+          }
+          ${
+            invoice.taxRate && parseFloat(invoice.taxRate) > 0
+              ? `
+            <div style="display: flex; justify-content: space-between; font-size: 14px; margin-bottom: 8px;">
+              <span style="color: #4b5563;">Tax (${invoice.taxRate}%)</span>
+              <span style="font-weight: 500; color: #374151;">$${parseFloat(invoice.taxAmount || "0").toFixed(2)}</span>
+            </div>
+          `
+              : ""
+          }
+          <div style="display: flex; justify-content: space-between; border-top: 1px solid #e5e7eb; padding-top: 8px;">
+            <span style="font-weight: 600; color: #111827;">Total</span>
+            <span style="font-size: 20px; font-weight: bold; color: #111827;">$${parseFloat(invoice.total).toFixed(2)}</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Spacer -->
+      <div style="flex: 1;"></div>
+
+      ${
+        invoice.notes
+          ? `
+        <div style="border-top: 1px solid #e5e7eb; padding-top: 24px; margin-top: 24px;">
+          <h3 style="font-size: 12px; font-weight: 500; color: #6b7280; text-transform: uppercase; letter-spacing: 0.05em; margin: 0;">Notes</h3>
+          <p style="margin-top: 8px; font-size: 14px; color: #4b5563; white-space: pre-line;">${invoice.notes}</p>
+        </div>
+      `
+          : ""
+      }
+    </div>
+  `;
+}
+
+// ============================================================================
 // TEMPLATE 1: CLASSIC (Basic)
 // Clean, traditional invoice layout with professional appearance
 // ============================================================================
@@ -40,7 +172,7 @@ function generateClassicTemplate(
     .join("");
 
   return `
-    <div style="padding: 40px; font-family: 'Georgia', 'Times New Roman', serif; width: 800px; background: white;">
+    <div style="padding: 40px; font-family: 'Georgia', 'Times New Roman', serif; width: 800px; min-height: 1131px; background: white; box-sizing: border-box; display: flex; flex-direction: column;">
       <!-- Header with border bottom -->
       <div style="display: flex; justify-content: space-between; align-items: flex-start; padding-bottom: 24px; border-bottom: 2px solid #1f2937;">
         <div>
@@ -137,6 +269,9 @@ function generateClassicTemplate(
         </div>
       </div>
 
+      <!-- Spacer -->
+      <div style="flex: 1;"></div>
+
       ${
         invoice.notes
           ? `
@@ -171,7 +306,7 @@ function generateSimpleTemplate(
     .join("");
 
   return `
-    <div style="padding: 48px; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; width: 800px; background: white;">
+    <div style="padding: 48px; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; width: 800px; min-height: 1131px; background: white; box-sizing: border-box; display: flex; flex-direction: column;">
       <!-- Minimal Header -->
       <div style="margin-bottom: 48px;">
         ${profile?.logoUrl ? `<img src="${profile.logoUrl}" alt="Logo" style="max-width: 120px; max-height: 60px; margin-bottom: 16px;" />` : ""}
@@ -232,10 +367,13 @@ function generateSimpleTemplate(
         </div>
       </div>
 
+      <!-- Spacer -->
+      <div style="flex: 1;"></div>
+
       ${
         invoice.notes
           ? `
-        <div style="margin-top: 64px;">
+        <div style="margin-top: 48px;">
           <p style="font-size: 12px; color: #888; text-transform: uppercase; letter-spacing: 1px; margin: 0;">Notes</p>
           <p style="font-size: 13px; color: #666; margin: 12px 0 0; line-height: 1.7; white-space: pre-line;">${invoice.notes}</p>
         </div>
@@ -270,7 +408,7 @@ function generateModernTemplate(
     .join("");
 
   return `
-    <div style="font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif; width: 800px; background: white;">
+    <div style="font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif; width: 800px; min-height: 1131px; background: white; display: flex; flex-direction: column;">
       <!-- Colored Header Bar -->
       <div style="background: linear-gradient(135deg, ${accentColor} 0%, #1d4ed8 100%); padding: 40px; color: white;">
         <div style="display: flex; justify-content: space-between; align-items: flex-start;">
@@ -287,7 +425,7 @@ function generateModernTemplate(
         </div>
       </div>
 
-      <div style="padding: 40px;">
+      <div style="padding: 40px; flex: 1; display: flex; flex-direction: column;">
         <!-- Info Cards Row -->
         <div style="display: flex; gap: 24px; margin-bottom: 40px;">
           <!-- Bill To Card -->
@@ -370,6 +508,9 @@ function generateModernTemplate(
           </div>
         </div>
 
+        <!-- Spacer to push notes to bottom -->
+        <div style="flex: 1;"></div>
+
         ${
           invoice.notes
             ? `
@@ -407,7 +548,7 @@ function generateProfessionalTemplate(
     .join("");
 
   return `
-    <div style="font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; width: 800px; background: white;">
+    <div style="font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; width: 800px; min-height: 1131px; background: white; display: flex; flex-direction: column;">
       <!-- Professional Header -->
       <div style="display: flex; justify-content: space-between; padding: 40px; background: #fafafa; border-bottom: 3px solid #111827;">
         <div style="display: flex; align-items: center; gap: 20px;">
@@ -425,7 +566,7 @@ function generateProfessionalTemplate(
         </div>
       </div>
 
-      <div style="padding: 40px;">
+      <div style="padding: 40px; flex: 1; display: flex; flex-direction: column;">
         <!-- Three Column Info Section -->
         <div style="display: flex; gap: 32px; margin-bottom: 40px; padding-bottom: 32px; border-bottom: 1px solid #e5e7eb;">
           <!-- From -->
@@ -531,8 +672,11 @@ function generateProfessionalTemplate(
             : ""
         }
 
+        <!-- Spacer to push footer to bottom -->
+        <div style="flex: 1;"></div>
+
         <!-- Footer -->
-        <div style="margin-top: 64px; text-align: center; padding-top: 24px; border-top: 1px solid #e5e7eb;">
+        <div style="margin-top: 40px; text-align: center; padding-top: 24px; border-top: 1px solid #e5e7eb;">
           <p style="font-size: 11px; color: #9ca3af; margin: 0;">Thank you for your business</p>
         </div>
       </div>
@@ -568,9 +712,9 @@ function generateCreativeTemplate(
     .join("");
 
   return `
-    <div style="font-family: 'Poppins', -apple-system, BlinkMacSystemFont, sans-serif; width: 800px; background: white; display: flex;">
+    <div style="font-family: 'Poppins', -apple-system, BlinkMacSystemFont, sans-serif; width: 800px; min-height: 1131px; background: white; display: flex;">
       <!-- Left Sidebar -->
-      <div style="width: 260px; background: linear-gradient(180deg, ${primaryColor} 0%, #5b21b6 100%); padding: 40px 30px; color: white;">
+      <div style="width: 260px; background: linear-gradient(180deg, ${primaryColor} 0%, #5b21b6 100%); padding: 40px 30px; color: white; display: flex; flex-direction: column;">
         <!-- Logo/Company -->
         <div style="margin-bottom: 40px;">
           ${profile?.logoUrl ? `<img src="${profile.logoUrl}" alt="Logo" style="max-width: 120px; max-height: 60px; margin-bottom: 16px; filter: brightness(0) invert(1);" />` : ""}
@@ -599,7 +743,7 @@ function generateCreativeTemplate(
         ${
           invoice.dueDate
             ? `
-          <div>
+          <div style="margin-bottom: 20px;">
             <p style="font-size: 10px; text-transform: uppercase; letter-spacing: 2px; opacity: 0.7; margin: 0 0 6px;">Due Date</p>
             <p style="font-size: 14px; margin: 0;">${formatDateForPdf(invoice.dueDate)}</p>
           </div>
@@ -607,8 +751,11 @@ function generateCreativeTemplate(
             : ""
         }
 
+        <!-- Spacer to push total to bottom -->
+        <div style="flex: 1;"></div>
+
         <!-- Total in Sidebar -->
-        <div style="margin-top: auto; padding-top: 40px;">
+        <div>
           <div style="background: white; color: ${primaryColor}; border-radius: 12px; padding: 20px; text-align: center;">
             <p style="font-size: 10px; text-transform: uppercase; letter-spacing: 2px; margin: 0 0 8px; color: #6b7280;">Total Due</p>
             <p style="font-size: 28px; font-weight: 800; margin: 0;">$${parseFloat(invoice.total).toFixed(2)}</p>
@@ -617,7 +764,7 @@ function generateCreativeTemplate(
       </div>
 
       <!-- Main Content -->
-      <div style="flex: 1; padding: 40px;">
+      <div style="flex: 1; padding: 40px; display: flex; flex-direction: column;">
         <!-- Header -->
         <div style="margin-bottom: 40px;">
           <h1 style="font-size: 48px; font-weight: 800; color: ${primaryColor}; margin: 0; letter-spacing: -2px;">INVOICE</h1>
@@ -676,7 +823,7 @@ function generateCreativeTemplate(
         ${
           invoice.notes
             ? `
-          <div style="margin-top: 48px; padding: 20px; background: #fefce8; border-radius: 12px;">
+          <div style="margin-top: 40px; padding: 20px; background: #fefce8; border-radius: 12px;">
             <p style="font-size: 10px; font-weight: 600; color: #a16207; text-transform: uppercase; letter-spacing: 2px; margin: 0 0 10px;">Notes</p>
             <p style="font-size: 13px; color: #713f12; line-height: 1.7; margin: 0; white-space: pre-line;">${invoice.notes}</p>
           </div>
@@ -684,8 +831,11 @@ function generateCreativeTemplate(
             : ""
         }
 
+        <!-- Spacer to push thank you to bottom -->
+        <div style="flex: 1;"></div>
+
         <!-- Thank You -->
-        <div style="margin-top: 40px; text-align: center;">
+        <div style="text-align: center; padding-top: 40px;">
           <p style="font-size: 24px; font-weight: 700; color: ${secondaryColor}; margin: 0;">Thank You!</p>
           <p style="font-size: 13px; color: #9ca3af; margin: 8px 0 0;">We appreciate your business</p>
         </div>
@@ -697,12 +847,14 @@ function generateCreativeTemplate(
 // ============================================================================
 // TEMPLATE SELECTOR
 // ============================================================================
-function generateInvoiceHtml(
+export function generateInvoiceHtml(
   invoice: InvoiceWithDetails,
   profile: Profile | null,
-  template: InvoiceTemplate = "classic"
+  template: InvoiceTemplate = "default"
 ): string {
   switch (template) {
+    case "classic":
+      return generateClassicTemplate(invoice, profile);
     case "simple":
       return generateSimpleTemplate(invoice, profile);
     case "modern":
@@ -711,9 +863,9 @@ function generateInvoiceHtml(
       return generateProfessionalTemplate(invoice, profile);
     case "creative":
       return generateCreativeTemplate(invoice, profile);
-    case "classic":
+    case "default":
     default:
-      return generateClassicTemplate(invoice, profile);
+      return generateDefaultTemplate(invoice, profile);
   }
 }
 
@@ -723,7 +875,7 @@ export async function downloadInvoicePdf(
   template?: InvoiceTemplate
 ): Promise<void> {
   // Use the template from profile if not explicitly provided
-  const selectedTemplate = template || profile?.invoiceTemplate || "classic";
+  const selectedTemplate = template || profile?.invoiceTemplate || "default";
 
   // Create a temporary container for rendering
   const container = document.createElement("div");
@@ -774,6 +926,12 @@ export async function downloadInvoicePdf(
 
 // Export template info for UI
 export const invoiceTemplates: { id: InvoiceTemplate; name: string; description: string; category: "basic" | "advanced" }[] = [
+  {
+    id: "default",
+    name: "Default",
+    description: "The original invoice template - clean and straightforward",
+    category: "basic",
+  },
   {
     id: "classic",
     name: "Classic",

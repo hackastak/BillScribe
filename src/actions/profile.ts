@@ -12,7 +12,7 @@ const profileSchema = z.object({
   address: z.string().optional(),
 });
 
-const validTemplates = ["classic", "simple", "modern", "professional", "creative"] as const;
+const validTemplates = ["default", "classic", "simple", "modern", "professional", "creative"] as const;
 
 export type ProfileActionState = {
   error?: string;

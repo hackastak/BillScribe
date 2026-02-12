@@ -1,6 +1,7 @@
 import { pgTable, uuid, text, timestamp, pgEnum } from 'drizzle-orm/pg-core';
 
 export const invoiceTemplateEnum = pgEnum('invoice_template', [
+  'default',
   'classic',
   'simple',
   'modern',
@@ -8,7 +9,7 @@ export const invoiceTemplateEnum = pgEnum('invoice_template', [
   'creative',
 ]);
 
-export type InvoiceTemplate = 'classic' | 'simple' | 'modern' | 'professional' | 'creative';
+export type InvoiceTemplate = 'default' | 'classic' | 'simple' | 'modern' | 'professional' | 'creative';
 
 export const profiles = pgTable('profiles', {
   id: uuid('id').primaryKey(),

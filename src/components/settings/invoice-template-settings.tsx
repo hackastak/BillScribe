@@ -15,7 +15,7 @@ export function InvoiceTemplateSettings({
   currentTemplate,
 }: InvoiceTemplateSettingsProps) {
   const [selected, setSelected] = useState<InvoiceTemplate>(
-    currentTemplate || "classic"
+    currentTemplate || "default"
   );
   const [isPending, startTransition] = useTransition();
   const [message, setMessage] = useState<{
@@ -36,7 +36,7 @@ export function InvoiceTemplateSettings({
           type: "error",
           text: result.error || "Failed to update template",
         });
-        setSelected(currentTemplate || "classic");
+        setSelected(currentTemplate || "default");
       }
     });
   };
@@ -125,6 +125,7 @@ function TemplateCard({
   onSelect,
 }: TemplateCardProps) {
   const previewColors: Record<InvoiceTemplate, { primary: string; secondary: string }> = {
+    default: { primary: "#374151", secondary: "#ffffff" },
     classic: { primary: "#1f2937", secondary: "#f9fafb" },
     simple: { primary: "#111111", secondary: "#ffffff" },
     modern: { primary: "#2563eb", secondary: "#f8fafc" },
