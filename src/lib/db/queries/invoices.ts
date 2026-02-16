@@ -578,7 +578,7 @@ export async function getMonthlyInvoiceCount(userId: string): Promise<number> {
     .where(
       and(
         eq(invoices.userId, userId),
-        sql`${invoices.createdAt} >= ${startOfMonth}`
+        sql`${invoices.createdAt} >= ${startOfMonth.toISOString()}`
       )
     );
 

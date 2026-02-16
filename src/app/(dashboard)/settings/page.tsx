@@ -29,7 +29,7 @@ export default async function SettingsPage() {
       <div className="space-y-6">
         <LogoUpload currentLogoUrl={profile?.logoUrl || null} />
         <ProfileSettings profile={profile} />
-        <InvoiceTemplateSettings currentTemplate={profile?.invoiceTemplate || null} />
+        <InvoiceTemplateSettings currentTemplate={profile?.invoiceTemplate || null} profile={profile} />
       </div>
     </div>
   );
