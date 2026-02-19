@@ -8,6 +8,8 @@ import {
   type SubscriptionTier,
   type TierLimits,
 } from './tiers';
+import { isTemplateAvailable, getTemplateTier } from './template-access';
+import type { InvoiceTemplate } from '@/lib/db/schema/profiles';
 
 export type UsageStats = {
   tier: SubscriptionTier;
@@ -110,5 +112,26 @@ export async function getUsageStats(userId: string): Promise<UsageStats> {
     },
     canCreateClient: canClient,
     canCreateInvoice: canInvoice,
+  };
+}
+
+export async function canUseTemplate(
+  userId: string,
+  templateId: InvoiceTemplate
+): Promise<{ allowed: boolean; reason?: string; requiredTier?: SubscriptionTier }> {
+  const tier = await getUserTier(userId);
+  const requiredTier = getTemplateTier(templateId);
+
+  if (isTemplateAvailable(tier, templateId)) {
+    return { allowed: true };
+  }
+
+  const tierName = getTierDisplayName(tier);
+  const requiredTierName = getTierDisplayName(requiredTier);
+
+  return {
+    allowed: false,
+    reason: `This template requires the ${requiredTierName} plan. You are currently on the ${tierName} plan.`,
+    requiredTier,
   };
 }

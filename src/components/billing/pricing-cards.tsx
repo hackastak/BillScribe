@@ -14,7 +14,7 @@ const PLANS = [
     features: [
       'Up to 3 clients',
       '5 invoices per month',
-      'Basic invoice template',
+      '2 invoice templates',
       'Email support',
     ],
     highlighted: false,
@@ -28,6 +28,7 @@ const PLANS = [
     features: [
       'Up to 10 clients',
       '30 invoices per month',
+      '3 invoice templates',
       'Custom invoice branding',
       'Priority email support',
       ],
@@ -42,6 +43,7 @@ const PLANS = [
     features: [
       'Unlimited clients',
       'Unlimited invoices',
+      'All 6 invoice templates',
       'Custom invoice branding',
       'Priority support',
     ],

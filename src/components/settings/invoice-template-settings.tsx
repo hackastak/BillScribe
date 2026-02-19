@@ -1,12 +1,16 @@
 "use client";
 
 import { useState, useTransition } from "react";
+import Link from "next/link";
 import { Card } from "@/components/ui/card";
 import { Spinner } from "@/components/ui/spinner";
 import { Modal } from "@/components/ui/modal";
 import { Button } from "@/components/ui/button";
 import { invoiceTemplates, generateInvoiceHtml } from "@/lib/pdf";
 import { updateInvoiceTemplateAction } from "@/actions/profile";
+import { isTemplateAvailable } from "@/lib/subscriptions/template-access";
+import { getTierDisplayName } from "@/lib/subscriptions/tiers";
+import type { SubscriptionTier } from "@/lib/subscriptions/tiers";
 import type { InvoiceTemplate } from "@/lib/db/schema/profiles";
 import type { Profile } from "@/lib/db/queries/profiles";
 import type { InvoiceWithDetails } from "@/lib/db/queries/invoices";
@@ -14,6 +18,7 @@ import type { InvoiceWithDetails } from "@/lib/db/queries/invoices";
 interface InvoiceTemplateSettingsProps {
   currentTemplate: InvoiceTemplate | null;
   profile: Profile | null;
+  userTier: SubscriptionTier;
 }
 
 // Sample invoice data for preview
@@ -66,6 +71,7 @@ function createSampleInvoice(): InvoiceWithDetails {
 export function InvoiceTemplateSettings({
   currentTemplate,
   profile,
+  userTier,
 }: InvoiceTemplateSettingsProps) {
   const [selected, setSelected] = useState<InvoiceTemplate>(
     currentTemplate || "default"
@@ -78,6 +84,11 @@ export function InvoiceTemplateSettings({
   const [previewTemplate, setPreviewTemplate] = useState<InvoiceTemplate | null>(null);
 
   const handleSelect = (templateId: InvoiceTemplate) => {
+    // Check if user has access to this template
+    if (!isTemplateAvailable(userTier, templateId)) {
+      return;
+    }
+
     setSelected(templateId);
     setMessage(null);
 
@@ -142,6 +153,8 @@ export function InvoiceTemplateSettings({
               template={template}
               isSelected={selected === template.id}
               isLoading={isPending && selected === template.id}
+              isLocked={!isTemplateAvailable(userTier, template.id)}
+              requiredTier={template.minTier}
               onSelect={() => handleSelect(template.id)}
               onPreview={() => handlePreview(template.id)}
             />
@@ -161,6 +174,8 @@ export function InvoiceTemplateSettings({
               template={template}
               isSelected={selected === template.id}
               isLoading={isPending && selected === template.id}
+              isLocked={!isTemplateAvailable(userTier, template.id)}
+              requiredTier={template.minTier}
               onSelect={() => handleSelect(template.id)}
               onPreview={() => handlePreview(template.id)}
             />
@@ -191,20 +206,28 @@ export function InvoiceTemplateSettings({
                 Preview with your company logo and sample invoice data
               </p>
             </div>
-            {selected !== previewTemplate && (
-              <Button
-                variant="primary"
-                size="sm"
-                onClick={() => {
-                  if (previewTemplate) {
-                    handleSelect(previewTemplate);
-                    setPreviewTemplate(null);
-                  }
-                }}
-                disabled={isPending}
-              >
-                Use This Template
-              </Button>
+            {selected !== previewTemplate && previewTemplate && (
+              isTemplateAvailable(userTier, previewTemplate) ? (
+                <Button
+                  variant="primary"
+                  size="sm"
+                  onClick={() => {
+                    if (previewTemplate) {
+                      handleSelect(previewTemplate);
+                      setPreviewTemplate(null);
+                    }
+                  }}
+                  disabled={isPending}
+                >
+                  Use This Template
+                </Button>
+              ) : (
+                <Link href="/settings/billing">
+                  <Button variant="primary" size="sm">
+                    Upgrade to {getTierDisplayName(invoiceTemplates.find(t => t.id === previewTemplate)?.minTier || "pro")}
+                  </Button>
+                </Link>
+              )
             )}
           </div>
           <div className="overflow-auto rounded-lg border border-[var(--color-border-default)] bg-white">
@@ -226,9 +249,12 @@ interface TemplateCardProps {
     name: string;
     description: string;
     category: "basic" | "advanced";
+    minTier: SubscriptionTier;
   };
   isSelected: boolean;
   isLoading: boolean;
+  isLocked: boolean;
+  requiredTier: SubscriptionTier;
   onSelect: () => void;
   onPreview: () => void;
 }
@@ -237,6 +263,8 @@ function TemplateCard({
   template,
   isSelected,
   isLoading,
+  isLocked,
+  requiredTier,
   onSelect,
   onPreview,
 }: TemplateCardProps) {
@@ -254,17 +282,33 @@ function TemplateCard({
   return (
     <div
       className={`relative text-left p-4 rounded-lg border-2 transition-all ${
-        isSelected
+        isLocked
+          ? "border-[var(--color-border-default)] bg-[var(--color-bg-subtle)] opacity-75"
+          : isSelected
           ? "border-[var(--color-border-accent)] bg-[var(--color-bg-accent-subtle)]"
           : "border-[var(--color-border-default)] hover:border-[var(--color-border-accent)] bg-[var(--color-bg-default)]"
       }`}
     >
+      {/* Locked Badge */}
+      {isLocked && (
+        <div className="absolute top-2 right-2 z-10">
+          <span className="inline-flex items-center gap-1 px-2 py-0.5 text-xs font-medium rounded-full bg-neutral-100 text-neutral-600 border border-neutral-200">
+            <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
+            </svg>
+            {getTierDisplayName(requiredTier)}
+          </span>
+        </div>
+      )}
+
       {/* Mini Preview - Clickable to select */}
       <button
         type="button"
-        onClick={onSelect}
-        disabled={isLoading}
-        className="w-full h-24 rounded-md mb-3 overflow-hidden border border-[var(--color-border-subtle)] cursor-pointer hover:opacity-90 transition-opacity"
+        onClick={isLocked ? undefined : onSelect}
+        disabled={isLoading || isLocked}
+        className={`w-full h-24 rounded-md mb-3 overflow-hidden border border-[var(--color-border-subtle)] transition-opacity ${
+          isLocked ? "cursor-not-allowed opacity-60" : "cursor-pointer hover:opacity-90"
+        }`}
         style={{ background: colors.secondary }}
       >
         {template.id === "creative" ? (
@@ -340,7 +384,7 @@ function TemplateCard({
             <h5 className="font-medium text-[var(--color-fg-default)]">
               {template.name}
             </h5>
-            {isSelected && (
+            {isSelected && !isLocked && (
               <span className="inline-flex items-center px-2 py-0.5 text-xs font-medium rounded-full bg-primary-600 text-white">
                 Selected
               </span>
@@ -352,32 +396,44 @@ function TemplateCard({
         </div>
         <div className="flex items-center gap-2 flex-shrink-0">
           {isLoading && <Spinner size="sm" />}
-          <button
-            type="button"
-            onClick={onPreview}
-            className="inline-flex items-center gap-1 px-2 py-1 text-xs font-medium text-[var(--color-fg-muted)] hover:text-[var(--color-fg-default)] hover:bg-[var(--color-bg-hover)] rounded transition-colors"
-          >
-            <svg
-              className="w-3.5 h-3.5"
-              fill="none"
-              stroke="currentColor"
-              viewBox="0 0 24 24"
+          {isLocked ? (
+            <Link
+              href="/settings/billing"
+              className="inline-flex items-center gap-1 px-2 py-1 text-xs font-medium text-white bg-primary-600 hover:bg-primary-700 rounded transition-colors"
             >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth={2}
-                d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"
-              />
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth={2}
-                d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"
-              />
-            </svg>
-            Preview
-          </button>
+              <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 7l5 5m0 0l-5 5m5-5H6" />
+              </svg>
+              Upgrade
+            </Link>
+          ) : (
+            <button
+              type="button"
+              onClick={onPreview}
+              className="inline-flex items-center gap-1 px-2 py-1 text-xs font-medium text-[var(--color-fg-muted)] hover:text-[var(--color-fg-default)] hover:bg-[var(--color-bg-hover)] rounded transition-colors"
+            >
+              <svg
+                className="w-3.5 h-3.5"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"
+                />
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"
+                />
+              </svg>
+              Preview
+            </button>
+          )}
         </div>
       </div>
     </div>

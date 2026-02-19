@@ -924,42 +924,58 @@ export async function downloadInvoicePdf(
   }
 }
 
+import type { SubscriptionTier } from "@/lib/subscriptions/tiers";
+
 // Export template info for UI
-export const invoiceTemplates: { id: InvoiceTemplate; name: string; description: string; category: "basic" | "advanced" }[] = [
+export type InvoiceTemplateInfo = {
+  id: InvoiceTemplate;
+  name: string;
+  description: string;
+  category: "basic" | "advanced";
+  minTier: SubscriptionTier;
+};
+
+export const invoiceTemplates: InvoiceTemplateInfo[] = [
   {
     id: "default",
     name: "Default",
     description: "The original invoice template - clean and straightforward",
     category: "basic",
+    minTier: "free",
   },
   {
     id: "classic",
     name: "Classic",
     description: "Traditional, clean layout with professional styling",
     category: "basic",
+    minTier: "free",
   },
   {
     id: "simple",
     name: "Simple",
     description: "Minimalist design focusing on essential information",
     category: "basic",
+    minTier: "pro",
   },
   {
     id: "modern",
     name: "Modern",
     description: "Bold headers with blue accent colors and contemporary look",
     category: "advanced",
+    minTier: "enterprise",
   },
   {
     id: "professional",
     name: "Professional",
     description: "Corporate style with structured sections and premium appearance",
     category: "advanced",
+    minTier: "enterprise",
   },
   {
     id: "creative",
     name: "Creative",
     description: "Unique sidebar layout with purple accent and creative spacing",
     category: "advanced",
+    minTier: "enterprise",
   },
 ];

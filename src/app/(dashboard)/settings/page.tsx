@@ -1,6 +1,7 @@
 import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 import { getProfile } from "@/lib/db/queries/profiles";
+import { getUserTier } from "@/lib/subscriptions/usage";
 import { LogoUpload } from "@/components/invoice/logo-upload";
 import { ProfileSettings } from "@/components/settings/profile-settings";
 import { InvoiceTemplateSettings } from "@/components/settings/invoice-template-settings";
@@ -15,7 +16,10 @@ export default async function SettingsPage() {
     redirect("/login");
   }
 
-  const profile = await getProfile(user.id);
+  const [profile, userTier] = await Promise.all([
+    getProfile(user.id),
+    getUserTier(user.id),
+  ]);
 
   return (
     <div className="space-y-6">
@@ -29,7 +33,7 @@ export default async function SettingsPage() {
       <div className="space-y-6">
         <LogoUpload currentLogoUrl={profile?.logoUrl || null} />
         <ProfileSettings profile={profile} />
-        <InvoiceTemplateSettings currentTemplate={profile?.invoiceTemplate || null} profile={profile} />
+        <InvoiceTemplateSettings currentTemplate={profile?.invoiceTemplate || null} profile={profile} userTier={userTier} />
       </div>
     </div>
   );

@@ -2,6 +2,7 @@
 
 import { createClient } from "@/lib/supabase/server";
 import { updateProfile } from "@/lib/db/queries/profiles";
+import { canUseTemplate } from "@/lib/subscriptions/usage";
 import { z } from "zod";
 import type { InvoiceTemplate } from "@/lib/db/schema/profiles";
 
@@ -84,6 +85,12 @@ export async function updateInvoiceTemplateAction(
 
   if (!validTemplates.includes(template)) {
     return { error: "Invalid template selected" };
+  }
+
+  // Check if user has access to this template
+  const accessCheck = await canUseTemplate(user.id, template);
+  if (!accessCheck.allowed) {
+    return { error: accessCheck.reason || "You don't have access to this template" };
   }
 
   try {

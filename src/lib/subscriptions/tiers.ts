@@ -55,3 +55,26 @@ export function getTierDisplayName(tier: SubscriptionTier): string {
   };
   return names[tier];
 }
+
+// Tier hierarchy for feature access comparison
+const TIER_LEVEL: Record<SubscriptionTier, number> = {
+  free: 0,
+  pro: 1,
+  enterprise: 2,
+};
+
+/**
+ * Check if a user's tier has access to a feature requiring a minimum tier
+ */
+export function hasAccessToTier(userTier: SubscriptionTier, requiredTier: SubscriptionTier): boolean {
+  return TIER_LEVEL[userTier] >= TIER_LEVEL[requiredTier];
+}
+
+/**
+ * Get the next tier for upgrade prompts
+ */
+export function getNextTier(currentTier: SubscriptionTier): SubscriptionTier | null {
+  if (currentTier === 'free') return 'pro';
+  if (currentTier === 'pro') return 'enterprise';
+  return null;
+}
