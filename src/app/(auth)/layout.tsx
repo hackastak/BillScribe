@@ -10,7 +10,7 @@ export default function AuthLayout({
       <div className="w-full max-w-md space-y-8">
         <div className="text-center">
           <Link href="/" className="inline-block">
-            <h1 className="text-3xl font-bold tracking-tight text-[var(--color-fg-default)]">
+            <h1 className="text-3xl font-bold font-serif tracking-tight text-[var(--color-fg-default)]">
               BillScribe
             </h1>
           </Link>

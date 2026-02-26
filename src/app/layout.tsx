@@ -6,6 +6,11 @@ export const metadata: Metadata = {
   title: "BillScribe",
   description:
     "A full-stack invoice creation and management tool built with Next.js and Supabase",
+  icons: {
+    icon: "/billscribe_favicon.png",
+    shortcut: "/billscribe_favicon.png",
+    apple: "/billscribe_favicon.png",
+  },
 };
 
 // Inline script to prevent flash of wrong theme - runs before React hydrates

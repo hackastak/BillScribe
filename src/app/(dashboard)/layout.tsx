@@ -25,7 +25,7 @@ export default async function DashboardLayout({
         <div className="mx-auto flex h-16 max-w-7xl items-center justify-between px-4 sm:px-6 lg:px-8">
           <div className="flex items-center gap-2 md:gap-8">
             <MobileNav />
-            <Link href="/dashboard" className="text-xl font-bold text-[var(--color-fg-default)]">
+            <Link href="/dashboard" className="text-3xl font-bold font-serif text-[var(--color-fg-default)]">
               BillScribe
             </Link>
             <nav className="hidden items-center gap-6 md:flex">

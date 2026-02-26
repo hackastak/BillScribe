@@ -97,7 +97,7 @@ export function MobileNav({ className }: MobileNavProps) {
         <div className="flex h-full flex-col">
           {/* Drawer Header */}
           <div className="flex h-16 items-center justify-between border-b border-[var(--color-border-default)] px-4">
-            <span className="text-xl font-bold text-[var(--color-fg-default)]">
+            <span className="text-xl font-bold font-serif text-[var(--color-fg-default)]">
               BillScribe
             </span>
             <button
