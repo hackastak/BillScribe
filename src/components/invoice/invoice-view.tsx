@@ -78,9 +78,9 @@ export function InvoiceView({
           >
             {isDownloading ? "Generating..." : "Download PDF"}
           </Button>
-          <Button variant="secondary" size="sm">
-            Send Invoice
-          </Button>
+          {/* <Button variant="secondary" size="sm"> */}
+          {/*   Send Invoice */}
+          {/* </Button> */}
           <Link href={`/invoices/${invoice.id}/edit`}>
             <Button variant="secondary" size="sm">
               Edit Invoice
