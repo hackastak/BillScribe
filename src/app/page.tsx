@@ -2,6 +2,7 @@ import Link from "next/link";
 import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 import { Button } from "@/components/ui/button";
+import { MarketingNav } from "@/components/marketing/marketing-nav";
 
 export default async function Home() {
   const supabase = await createClient();
@@ -15,17 +16,7 @@ export default async function Home() {
 
   return (
     <main className="min-h-screen bg-[var(--color-bg-base)]">
-      {/* NavBar */}
-      <header className="sticky top-0 z-50 border-b border-[var(--color-border-default)] bg-[var(--color-bg-surface)]">
-        <div className="mx-auto flex h-16 max-w-7xl items-center justify-between px-4 sm:px-6 lg:px-8">
-          <Link
-            href="/"
-            className="text-xl font-bold font-serif text-[var(--color-fg-default)]"
-          >
-            BillScribe
-          </Link>
-        </div>
-      </header>
+      <MarketingNav />
 
       {/* Hero Section */}
       <section className="flex flex-col items-center justify-center px-6 py-24 sm:py-32">
